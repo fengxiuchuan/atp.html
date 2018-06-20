@@ -58,7 +58,8 @@ export default {
       this.loading = true;
 
 	this.$http.post(urlMemberList, para, res => {
-			console.log(res)
+			this.members = res.data.data.rows
+			this.loading = false;
 		});
     }
   },

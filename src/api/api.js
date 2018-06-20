@@ -1,4 +1,7 @@
 import axios from 'axios'
+// 解决axios跨域问题
+axios.defaults.withCredentials = true
+axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 let baseURL = 'http://localhost:7005'
 export const getMemberList = params => { return axios.post(`/atpMember/queryAllList.json`, { params: params }) }
 
@@ -33,12 +36,12 @@ let http = axios.create({
   }]
 })
 
-function  apiAxios(method, url, params, response) {
+function apiAxios (method, url, params, response) {
   http({
     method: method,
     url: url,
     data: method === 'POST' || method === 'PUT' ? params : null,
-    params: method === 'GET' || method === 'DELETE' ? params : null,
+    params: method === 'GET' || method === 'DELETE' ? params : null
   }).then(function (res) {
     response(res)
   }).catch(function (err) {

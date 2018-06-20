@@ -5,11 +5,11 @@ import App from './App'
 import routes from './router/routes.js'
 import Api from './api/api.js'
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
 import VueRouter from 'vue-router'
 import store from './vuex/store'
 import Vuex from 'vuex'
 
+import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
