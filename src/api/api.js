@@ -2,6 +2,8 @@ import axios from 'axios'
 // 解决axios跨域问题
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+axios.defaults.timeout =  6000;
+
 let baseURL = 'http://localhost:7005'
 export const getMemberList = params => { return axios.post(`/atpMember/queryAllList.json`, { params: params }) }
 
