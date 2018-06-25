@@ -40,34 +40,48 @@
 			</el-table>
 		
 
-			<!--工具条-->
-			<!-- <el-col :span="24" class="toolbar">
-				<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
-				</el-pagination>
-			</el-col> -->
-
+		<!--工具条-->
 		<pagination @search="pageSearch" :total="total" :currentPage = "page"></pagination>
 
 		<!--新增界面-->
-		<el-dialog title="新增"  :visible.sync="addFormVisible" :close-on-click-modal="true">
+		<el-dialog :title="formTitle"  :visible.sync="addFormVisible" :close-on-click-modal="true">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
+				<el-input type="hidden" v-model="addForm.id"></el-input>
 				<el-form-item label="姓名" prop="name">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
+					<el-input :readonly="readOnly" v-model="addForm.name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="性别">
-					<el-radio-group v-model="addForm.sex">
+					<el-radio-group  :readonly="readOnly"  v-model="addForm.sex">
 						<el-radio class="radio" :label="1">男</el-radio>
 						<el-radio class="radio" :label="0">女</el-radio>
 					</el-radio-group>
 				</el-form-item>
 				<el-form-item label="年龄">
-					<el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
+					<el-input-number :readonly="readOnly"  v-model="addForm.age" :min="0" :max="200"></el-input-number>
 				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+				<el-form-item label="联系方式">
+					<el-input  :readonly="readOnly"  v-model="addForm.phone" placeholder="请填写联系方式"></el-input>
 				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="addForm.address"></el-input>
+				<el-form-item label="身份证号码">
+					<el-input  :readonly="readOnly" v-model="addForm.idCard" placeholder="请填写身份证号码"></el-input>
+				</el-form-item>
+				<el-form-item label="出生日期">
+					<el-date-picker :readonly="readOnly"   type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+				</el-form-item>
+				<el-form-item label="会员卡号"> 
+					<el-input  :readonly="readOnly"  v-model="addForm.cardNo" placeholder="会员卡号"></el-input>
+				</el-form-item>
+				<el-form-item label="会员密码">
+					<el-input  :readonly="readOnly"  type="password" v-model="addForm.cardPwd" placeholder="请填写密码"></el-input>
+				</el-form-item>
+				<el-form-item label="重复密码">
+					<el-input :readonly="readOnly"  type="password" v-model="addForm.repeatPwd" placeholder="重复密码"></el-input>
+				</el-form-item>
+				<el-form-item label="联系地址">
+					<el-input  :readonly="readOnly" type="textarea" v-model="addForm.address" placeholder="联系地址"></el-input>
+				</el-form-item>
+				<el-form-item label="备注">
+					<el-input  :readonly="readOnly"  type="textarea" v-model="addForm.remark"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -79,7 +93,7 @@
 		<!--编辑界面-->
 		<el-dialog title="编辑"  :visible.sync="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el
+				<el-input type="hidden" v-model="editForm.id"></el-input>
 				<el-form-item label="姓名" prop="name">
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>
 				</el-form-item>
@@ -92,11 +106,29 @@
 				<el-form-item label="年龄">
 					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
 				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
+				<el-form-item label="editForm">
+					<el-input v-model="addForm.phone" placeholder="请填写联系方式"></el-input>
 				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.address"></el-input>
+				<el-form-item label="身份证号码">
+					<el-input  v-model="editForm.idCard" placeholder="请填写身份证号码"></el-input>
+				</el-form-item>
+				<el-form-item label="出生日期">
+					<el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+				</el-form-item>
+				<el-form-item label="会员卡号">
+					<el-input v-model="editForm.cardNo" placeholder="会员卡号"></el-input>
+				</el-form-item>
+				<el-form-item label="会员密码">
+					<el-input type="password" v-model="editForm.cardPwd" placeholder="请填写密码"></el-input>
+				</el-form-item>
+				<el-form-item label="重复密码">
+					<el-input type="password" v-model="editForm.repeatPwd" placeholder="重复密码"></el-input>
+				</el-form-item>
+				<el-form-item label="联系地址">
+					<el-input type="textarea" v-model="editForm.address" placeholder="联系地址"></el-input>
+				</el-form-item>
+				<el-form-item label="备注">
+					<el-input type="textarea" v-model="editForm.remark"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -121,6 +153,8 @@ export default {
       filters: {
         name: ""
       },
+			readOnly:false,
+			formTitle:"新增",
       listLoading: false,
 			members: [],
 			total:0,
@@ -227,8 +261,9 @@ export default {
 		// 编辑按钮
 		//显示编辑界面
 		handleEdit: function (index, row) {
-			this.editFormVisible = true;
-			this.editForm = Object.assign({}, row);
+			this.addFormVisible = true;
+			//查询
+			this.addForm = Object.assign({}, row);
 		},
 		addSubmit:function(){
 			this.$refs['addForm'].validate((valid) => {
