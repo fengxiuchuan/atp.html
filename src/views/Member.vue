@@ -46,7 +46,7 @@
 				</el-pagination>
 			</el-col> -->
 
-		<a-pager @pageChange="pageChange" :pageination= "pageination"></a-pager>
+		<pagination @search="pageSearch" :total="total" :currentPage = "page"></pagination>
 
 		<!--新增界面-->
 		<el-dialog title="新增"  :visible.sync="addFormVisible" :close-on-click-modal="true">
@@ -112,7 +112,7 @@
 import 'element-ui/lib/theme-chalk/index.css'
 import { urlMemberList, urlAddMember, urlUpdateMember } from "../api/req_member";
 import util from '../common/js/util'
-import APager from '../components/pager'
+import Pageination from '../components/pagination'
 //import NProgress from 'nprogress'
  
 export default {
@@ -123,11 +123,9 @@ export default {
       },
       listLoading: false,
 			members: [],
-			pageination:{
-				total:0,
-				page:1,
-				pageSize:20
-			},
+			total:0,
+			page:1,
+			pageSize:20,
 			addFormVisible:false,
 			addLoading:false,
 			addForm:{
@@ -185,20 +183,20 @@ export default {
     getUsers: function() {
       let para = {
 				name: this.filters.name,
-				page:this.pageination.page,
-				pageSize:this.pageination.pageSize
+				page:this.page,
+				pageSize:this.pageSize
       };
       this.listLoading = true;
 			// 请求后台
 			this.$http.post(urlMemberList, para, res => {
 				if(res.data.code =='A_SYS_00010'){
 						this.members = res.data.data.rows;
-						this.pageination.total = res.data.data.total;
-						this.pageination.page = res.data.data.page;
+						this.total = res.data.data.total;
+						this.page = res.data.data.page;
 				}else{
 						this.members = [];
-						this.pageination.total = 0;
-						this.pageination.page = 1;
+						this.total = 0;
+						this.page = 1;
 				}
 				
 				this.listLoading = false;
@@ -259,10 +257,10 @@ export default {
 				}
 			})
 		},
-		pageChange:function(pageination){
-				this.pageination.page = pageination.page;
-				this.pageination.pageSize = pageination.pageSize;
-				this.pageination.total = pageination.total;
+		pageSearch:function(pageination){
+				this.page = pageination.page;
+				this.pageSize = pageination.pageSize;
+				this.total = pageination.total;
 				this.getUsers()
 		},
 		editSubmit:function(){
@@ -297,7 +295,7 @@ export default {
     this.getUsers();
 	},
 	components:{
-		'a-pager':APager
+		'pagination':Pageination
 	}
 };
 </script>

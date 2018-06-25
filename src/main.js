@@ -8,7 +8,7 @@ import ElementUI from 'element-ui'
 import VueRouter from 'vue-router'
 import store from './vuex/store'
 import Vuex from 'vuex'
-import APager from './components/pager'
+import Pageination from './components/pagination'
 import 'element-ui/lib/theme-chalk/index.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
