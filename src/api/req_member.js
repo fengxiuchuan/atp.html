@@ -4,5 +4,6 @@ const urlMemberList = '/atpMember/queryAllList.json'
 const urlAddMember = '/atpMember/addMem.do'
 // 更新会员
 const urlUpdateMember = '/atpMember/updateMem.do'
+// 查看详情
 
 export { urlMemberList, urlAddMember, urlUpdateMember  }
