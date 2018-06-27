@@ -5,5 +5,9 @@ const urlAddMember = '/atpMember/addMem.do'
 // 更新会员
 const urlUpdateMember = '/atpMember/updateMem.do'
 // 查看详情
+const urlGetMemById = '/atpMember/getMemById.json'
 
-export { urlMemberList, urlAddMember, urlUpdateMember  }
+// 查看会员所报课程
+const urlGetCourseListByMemId = '/atpMember/queryCourseListByMemId.json'
+
+export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId }
