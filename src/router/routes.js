@@ -3,6 +3,7 @@ import NotFound from '../views/404.vue'
 import Home from '../views/Home.vue'
 // import Main from '../views/Main.vue'
 import Member from '../views/Member.vue'
+import Coach from '../views/Coach.vue'
 let routes = [
   {
     path: '/login',
@@ -43,10 +44,11 @@ let routes = [
     path: '/',
     component: Home,
     name: '',
-    iconCls: 'fa fa-address-card',
-    leaf: true, // 只有一个节点
+    iconCls: 'el-icon-message',
+    // leaf: fa, // 只有一个节点
     children: [
-      { path: '/Member', component: Member, name: '会员' }
+      { path: '/Member', component: Member, name: '会员管理' },
+      { path: '/Coach', component: Coach, name: '教练管理' }
     ]
   },
   // {

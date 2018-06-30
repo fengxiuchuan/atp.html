@@ -2,15 +2,24 @@
 	<section>
 			<!--工具条-->
 			<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-				<el-form :inline="true" :model="filters">
-					<el-form-item>
-						<el-input v-model="filters.name" placeholder="姓名"></el-input>
+				<el-form :model="searchForm" ref="searchForm" :inline="true">
+					<el-input :model="searchForm.page" type="hidden"  ></el-input>
+					<el-input :model="searchForm.pageSize" type="hidden"></el-input>
+					<el-form-item prop="name">
+						<el-input v-model="searchForm.name"  placeholder="姓名"></el-input>
 					</el-form-item>
 					<el-form-item>
-						<el-button type="primary" v-on:click="getUsers">查询</el-button>
+						<el-button icon="el-icon-search" type="primary" v-on:click="getUsers">查询</el-button>
 					</el-form-item>
 					<el-form-item>
-						<el-button type="primary" @click="handleAdd">新增</el-button>
+						<el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
+					</el-form-item>
+				</el-form>
+			</el-col>
+			<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+				<el-form :inline="true">
+					<el-form-item>
+							<el-button type="primary" @click="handleAdd">新增</el-button>
 					</el-form-item>
 				</el-form>
 			</el-col>
@@ -244,7 +253,7 @@
 	</section>
 </template>
 <script>
-import 'element-ui/lib/theme-chalk/index.css'
+
 import 
 { 
  urlMemberList,
@@ -260,8 +269,10 @@ import Pageination from '../components/pagination'
 export default {
   data() {
     return {
-		filters: {
-			name: ""
+		searchForm: {
+			name: "",
+			page:1,
+			pageSize:20
 		},
 		total:0,
 		page:1,
@@ -353,18 +364,19 @@ export default {
     //性别显示转换
     formatSex: function(row, column) {
       return row.sex == 1 ? "男" : row.sex == 0 ? "女" : "未知";
-		},
-		handleCurrentChange(val) {
-				this.page = val;
-				this.getUsers();
-		},
+	},
+	handleCurrentChange(val) {
+			this.page = val;
+			this.getUsers();
+	},
+	resetSearchFrom:function(formName){
+		this.$refs['searchForm'].resetFields();
+	},
     //获取用户列表
     getUsers: function() {
-      let para = {
-				name: this.filters.name,
-				page:this.page,
-				pageSize:this.pageSize
-      };
+	  this.searchForm.page = this.page;
+	  this.searchForm.pageSize = this.pageSize;
+	  let para = Object.assign({}, this.searchForm);
       this.listLoading = true;
 			// 请求后台
 			this.$http.post(urlMemberList, para, res => {
@@ -385,6 +397,7 @@ export default {
 		// 新增按钮
 		handleAdd:function(){
 			this.addFormVisible = true;
+			this.changeInitData(this.formTypeObj.add);
 			this.addForm = {
 				name:'',
 				sex: -1,
@@ -509,17 +522,17 @@ export default {
 				}
 			})
 		},
-		pageSearch:function(pageination){
-				this.page = pageination.page;
-				this.pageSize = pageination.pageSize;
-				this.total = pageination.total;
-				this.getUsers()
-		},
+	pageSearch:function(pageination){
+			this.page = pageination.page;
+			this.pageSize = pageination.pageSize;
+			this.total = pageination.total;
+			this.getUsers()
+	},
 		
   },
   mounted() {
     this.getUsers();
-	},
+  },
 	components:{
 		'pagination':Pageination
 	}

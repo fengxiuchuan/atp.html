@@ -10,6 +10,7 @@ import store from './vuex/store'
 import Vuex from 'vuex'
 import Pageination from './components/pagination'
 import 'element-ui/lib/theme-chalk/index.css'
+import '@/assets/icon/iconfont.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
