@@ -42,7 +42,7 @@
             </el-table-column>
             <el-table-column prop="jobState" label="是否在职"  >
                  <template scope="scope">
-                        <el-switch disabled="true"
+                        <el-switch disabled
                             active-text ="是"
                             inactive-text = "否"
                             on-color="#5B7BFA"
@@ -58,7 +58,6 @@
                 <template scope="scope">
                     <el-button size="small" icon="el-icon-more" @click="handleDetail(scope.$index, scope.row)"></el-button>
                     <el-button size="small" icon="el-icon-edit-outline" @click="handleEdit(scope.$index, scope.row)"></el-button>
-                    <el-button size="small" icon="el-icon-delete" @click="delCoach(scope.$index, scope.row)"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -73,8 +72,8 @@
 				<el-input type="hidden" v-model="addForm.id"></el-input>
 				<el-row>
 					<el-col :span="12">
-						<el-form-item label="姓名" prop="name">
-							<el-input  v-model="addForm.name" auto-complete="off"></el-input>
+						<el-form-item label="姓名" prop="coachName">
+							<el-input  v-model="addForm.coachName" auto-complete="off"></el-input>
 						</el-form-item>
 					</el-col>
 					<el-col :span="12">
@@ -103,8 +102,8 @@
 					<el-col :span="12">
 						<el-form-item label="是否在职" prop="jobState">
                             <el-radio-group    v-model="addForm.jobState">
-								<el-radio class="radio" :label="Y">是</el-radio>
-								<el-radio class="radio" :label="N">否</el-radio>
+                                <el-radio-button label="Y">是</el-radio-button>
+                                <el-radio-button label="N">否</el-radio-button>
 							</el-radio-group>
 						</el-form-item>
 					</el-col>
@@ -136,7 +135,7 @@
                 <el-row>
                     <el-col :span="24">
                         <el-form-item label="项目" prop="courseIdArr">
-                            <el-select v-model="addForm.courseIdArr" multiple="true" filterable placeholder="请选择">
+                            <el-select v-model="addForm.courseIdArr" multiple filterable placeholder="请选择">
                                 <el-option
                                 v-for="item in courseList"
                                 :key="item.courseNo"
@@ -182,8 +181,8 @@ export default {
             page:1,
             pageSize:20,
             coachList: [],
-            courseList:[],
-            gymList:[],
+            courseList:[{courseNo:'',courseName:'请选择'}],
+            gymList:[{id:-1,gymName:"请选择"}],
             formType:'add',
             formTypeObj:{
                 add :'add',
@@ -265,7 +264,7 @@ export default {
         //2.1 新增窗口
         handleAdd:function(){
             this.addFormVisible = true;
-             this.changeInitData(this.formTypeObj.add);
+            this.changeInitData(this.formTypeObj.add);
             this.addForm = {
                 name:'',
                 birth: '',
@@ -321,7 +320,7 @@ export default {
 			})
         },
         getCoachDetailById:function(coachId){
-            if(coachId){
+            if(!coachId){
                 return this.coach;
             }
             let coachInfo = {} 
@@ -330,6 +329,7 @@ export default {
                     this.addLoading = false;
                     if(res && res.data && responeSucCode === res.data.code){
                        coachInfo = Object.assign({},res.data.data)
+                       this.addForm = Object.assign({},res.data.data)
                     }else{
                         this.$message({
                             message: res.data.msg,
@@ -362,9 +362,9 @@ export default {
         //3.1 编辑窗口
         handleEdit: function(index,row){
             this.addLoading = true;
-            this.addForm =  getCoachDetailById(row.id);
+            this.addForm =  this.getCoachDetailById(row.id);
             this.changeInitData(this.formTypeObj.edit);
-            thia.addFormVisible = true;
+            this.addFormVisible = true;
         },
         
         //3.2 编辑提交
@@ -372,6 +372,7 @@ export default {
         handleDetail: function(index,row){
             
         },
+       
         initGymList: function(){
             this.$http.post(urlGetGymList, {}, res => {
                     this.addLoading = false;
