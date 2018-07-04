@@ -319,16 +319,40 @@ export default {
 				}
 			})
         },
+        getCoachCourseList:function(coachId){
+            if(!coachId){
+                return;
+            }
+            
+            let para = {coachId:coachId}
+            this.$http.get(urlQueryCourseByCoachId, para, res => {
+                    this.addLoading = false;
+                    if(res && res.data && responeSucCode === res.data.code){
+                        
+                        this.addForm.courseIdArr = []
+                        res.data.data.map(function(item,key,ary) {
+                            return this.addForm.courseIdArr.push(item.id)
+                        });
+                        console.log(this.addForm.courseIdArr)
+                    }else{
+                        this.$message({
+                            message: res.data.msg,
+                            type: 'warning'
+                        });
+                    }
+
+            });
+        },
         getCoachDetailById:function(coachId){
             if(!coachId){
                 return this.coach;
             }
-            let coachInfo = {} 
+            
             let para = {coachId:coachId}
-            this.$http.get(urlQueryDetailById, para, res => {
+            this.$http.get(urlQueryCourseByCoachId, para, res => {
                     this.addLoading = false;
                     if(res && res.data && responeSucCode === res.data.code){
-                       coachInfo = Object.assign({},res.data.data)
+                      
                        this.addForm = Object.assign({},res.data.data)
                     }else{
                         this.$message({
@@ -338,7 +362,7 @@ export default {
                     }
 
             });
-            return coachInfo;
+            
         },
         changeInitData:function(formTppe){
 			if(this.formTypeObj.add=== formTppe ){
@@ -362,7 +386,8 @@ export default {
         //3.1 编辑窗口
         handleEdit: function(index,row){
             this.addLoading = true;
-            this.addForm =  this.getCoachDetailById(row.id);
+            this.getCoachDetailById(row.id);
+            this.getCoachCourseList(row.id);
             this.changeInitData(this.formTypeObj.edit);
             this.addFormVisible = true;
         },
