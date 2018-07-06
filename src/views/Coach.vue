@@ -32,7 +32,7 @@
             </el-table-column>
             <el-table-column prop="coachName" label="姓名"  sortable>
             </el-table-column>
-            <el-table-column prop="sex" label="性别" :formatter="formatSex" sortable>
+            <el-table-column prop="sex" label="性别" :formatter="parseSex" sortable>
             </el-table-column>
             <el-table-column prop="age" label="年龄"  sortable>
             </el-table-column>
@@ -76,19 +76,7 @@
 							<el-input  v-model="addForm.coachName" auto-complete="off"></el-input>
 						</el-form-item>
 					</el-col>
-					<el-col :span="12">
-						<el-form-item label="出生日期">
-							<el-date-picker    type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
-						</el-form-item>
-					</el-col>
 					
-				</el-row>
-				<el-row>
-					<el-col :span="12">
-							<el-form-item label="年龄">
-								<el-input-number   v-model="addForm.age" :min="0" :max="200"></el-input-number>
-							</el-form-item>
-					</el-col>
 					<el-col :span="12">
 						<el-form-item label="性别" prop="sex">
 							<el-radio-group    v-model="addForm.sex">
@@ -97,6 +85,19 @@
 							</el-radio-group>
 						</el-form-item>
 					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+							<el-form-item label="年龄">
+								<el-input-number   v-model="addForm.age" :min="0" :max="200"></el-input-number>
+							</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="出生日期">
+							<el-date-picker    type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+						</el-form-item>
+					</el-col>
+                    
 				</el-row>
 				<el-row>
 					<el-col :span="12">
@@ -128,14 +129,14 @@
                     </el-col>
 					<el-col :span="24">
 						<el-form-item label="用户密码" prop="userPasswd"> 
-							<el-input    v-model="addForm.userPasswd" placeholder="会员卡号"></el-input>
+							<el-input    v-model="addForm.userPasswd" placeholder="用户密码"></el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
                 <el-row>
                     <el-col :span="24">
                         <el-form-item label="项目" prop="courseIdArr">
-                            <el-select v-model="addForm.courseIdArr" multiple filterable placeholder="请选择">
+                            <el-select v-model="addForm.courseIdArr"  multiple filterable placeholder="请选择">
                                 <el-option
                                 v-for="item in courseList"
                                 :key="item.courseNo"
@@ -156,6 +157,77 @@
         <!--新增页面-->
 
         <!--详情页面-->
+        <el-dialog title="详情页面"  :visible.sync="detailVisible" :close-on-click-modal="true" :loadding="detailLoading">
+            <el-form  label-width="100px" label-suffix="：" >
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="姓名"  >
+							<span v-text="coach.coachName" ></span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+						<el-form-item label="性别">
+							<span>{{coach.sex | parseSex}}</span>
+						</el-form-item>
+					</el-col>
+					
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+							<el-form-item label="年龄">
+								<span v-text="coach.age"></span>
+							</el-form-item>
+					</el-col>
+					
+					<el-col :span="12">
+						<el-form-item label="出生日期" >
+							<span v-text=" coach.birth"></span>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="是否在职">
+                           <span>{{coach.jobState | parseJobState}}</span>
+						</el-form-item>
+					</el-col>
+					<el-col :span="12">
+                        <el-form-item label="所在场馆">
+							<el-select v-model="coach.gymId" disabled filterable placeholder="请选择">
+                                <el-option
+                                v-for="item in gymList"
+                                :key="item.id"
+                                :label="item.gymName"
+                                :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col :span="12">
+						<el-form-item label="用户名" > 
+							<span v-text="coach.userAccount"></span>
+						</el-form-item>
+					</el-col>
+                    <el-col :span="12">
+					<el-form-item label="项目">
+                            <el-select v-model="coachCourseArr" disabled multiple filterable placeholder="请选择">
+                                <el-option
+                                v-for="item in courseList"
+                                :key="item.courseNo"
+                                :label="item.courseName"
+                                :value="item.courseNo">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+				</el-row>
+			</el-form>
+             <div slot="footer" class="dialog-footer">
+				    <el-button @click.native="detailVisible = false">关闭</el-button>
+			    </div>
+        </el-dialog>
     </section>
 </template>
 <script>
@@ -203,6 +275,7 @@ export default {
                 gymId:'',
                 userAccount:'',
                 userPasswd:'',
+                courseIdArr:[]
             },
             addFormRules:{
                 coachName:[
@@ -223,12 +296,23 @@ export default {
                 age:'',
                 sex:-1,
                 jobState:'',
-                gymId:'',
+                gymId:-1,
                 userAccount:'',
                 userPasswd:'',
-                courseList:[]
-            }
+                courseIdArr:[]
+            },
+            detailVisible:false,
+            detailLoading:false,
+            coachCourseArr:[]
         }
+    },
+    filters:{
+        parseJobState:function(jobState){
+            return jobState == 'Y'? "是": jobState == 'Y' ?"否":"未知";
+        },
+        parseSex: function(sex) {
+            return sex == 1 ? "男" : sex == 0 ? "女" : "未知";
+        },
     },
     methods:{
         //1 列表
@@ -239,7 +323,7 @@ export default {
             this.listLoading = true;
 			// 请求后台
 			this.$http.post(urlQueryAllList, para, res => {
-				if(res.data && responeSucCode === res.data.code){
+				if(res.data && 'A_SYS_00010' === res.data.code){
 						this.coachList = res.data.data.rows;
 						this.total = res.data.data.total;
 						this.page = res.data.data.page;
@@ -254,9 +338,6 @@ export default {
 
         },
        
-        formatSex: function(row, column) {
-            return row.sex == 1 ? "男" : row.sex == 0 ? "女" : "未知";
-        },
         resetSearchFrom:function(formName){
             this.$refs[formName].resetFields();
         },
@@ -274,20 +355,22 @@ export default {
                 gymId:'',
                 userAccount:'',
                 userPasswd:'',
-            }
+                courseIdArr:[]
+            },
+            this.coachCourseArr = []
         },
         //2.2 新增提交
         formSubmit:function(){
             var formSubmitUrl = '';
             var confirmTxt = '确认提交么?'
             if(this.formType === this.formTypeObj.add){
-                formSubmitUrl = this.urlAddCoach;
+                formSubmitUrl = urlAddCoach;
             }
             if(this.formType === this.formTypeObj.edit){
                 confirmTxt = "确认修改么？"
-                formSubmitUrl = this.urlUpdateCoach;
+                formSubmitUrl = urlUpdateCoach;
             }
-            this.$refs[formNameObj.addForm].validate((valid) => {
+            this.$refs[this.formNameObj.addForm].validate((valid) => {
 				if(valid){
 						this.$confirm(confirmTxt,'提示',{
 						confirmButtonText: '确定',
@@ -299,12 +382,12 @@ export default {
 							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
 							this.$http.post(formSubmitUrl, para, res => {
 								this.addLoading = false;
-								if(res && res.data && responeSucCode === res.data.code){
+								if(res && res.data && 'A_SYS_00010' === res.data.code){
 								    this.$message({
 										message: res.data.msg,
 										type: 'success'
 									});
-									this.$refs[formTypeObj.addForm].resetFields();
+									this.$refs[this.formTypeObj.addForm].resetFields();
 									this.addFormVisible = false;
 									this.getCoachList();
 								}else{
@@ -327,13 +410,15 @@ export default {
             let para = {coachId:coachId}
             this.$http.get(urlQueryCourseByCoachId, para, res => {
                     this.addLoading = false;
-                    if(res && res.data && responeSucCode === res.data.code){
+                    if(res && res.data && 'A_SYS_00010' === res.data.code){
                         
                         this.addForm.courseIdArr = []
-                        res.data.data.map(function(item,key,ary) {
-                            return this.addForm.courseIdArr.push(item.id)
+                        res.data.data.forEach(item => {
+                            this.addForm.courseIdArr.push(item.courseNo)
                         });
-                        console.log(this.addForm.courseIdArr)
+
+                        this.coachCourseArr = this.addForm.courseIdArr
+                        
                     }else{
                         this.$message({
                             message: res.data.msg,
@@ -349,11 +434,13 @@ export default {
             }
             
             let para = {coachId:coachId}
-            this.$http.get(urlQueryCourseByCoachId, para, res => {
+            this.$http.get(urlQueryDetailById, para, res => {
                     this.addLoading = false;
-                    if(res && res.data && responeSucCode === res.data.code){
-                      
+                    if(res && res.data && 'A_SYS_00010' === res.data.code){
+                       
+                       this.coach =  Object.assign({},res.data.data)
                        this.addForm = Object.assign({},res.data.data)
+                        this.getCoachCourseList(coachId);
                     }else{
                         this.$message({
                             message: res.data.msg,
@@ -387,7 +474,7 @@ export default {
         handleEdit: function(index,row){
             this.addLoading = true;
             this.getCoachDetailById(row.id);
-            this.getCoachCourseList(row.id);
+           
             this.changeInitData(this.formTypeObj.edit);
             this.addFormVisible = true;
         },
@@ -395,13 +482,16 @@ export default {
         //3.2 编辑提交
         //4 查询详情
         handleDetail: function(index,row){
-            
+            this.detailLoading = true;
+            this.getCoachDetailById(row.id);
+           
+            this.detailVisible = true;
         },
        
         initGymList: function(){
             this.$http.post(urlGetGymList, {}, res => {
                     this.addLoading = false;
-                    if(res && res.data && responeSucCode === res.data.code){
+                    if(res && res.data && 'A_SYS_00010' === res.data.code){
                        this.gymList = res.data.data;
                     }else{
                         this.gymList = [];
@@ -412,7 +502,7 @@ export default {
         initCourseList: function(){
             this.$http.post(urlGetCourseList, {}, res => {
                     this.addLoading = false;
-                    if(res && res.data && responeSucCode === res.data.code){
+                    if(res && res.data && 'A_SYS_00010' === res.data.code){
                        this.courseList = res.data.data;
                     }else{
                         this.courseList = [];
