@@ -32,6 +32,8 @@
             </el-table-column>
             <el-table-column prop="coachName" label="姓名"  sortable>
             </el-table-column>
+            <el-table-column prop="phone" label="联系方式"  sortable>
+            </el-table-column>
             <el-table-column prop="sex" label="性别" :formatter="parseSex" sortable>
             </el-table-column>
             <el-table-column prop="age" label="年龄"  sortable>
@@ -87,19 +89,25 @@
 					</el-col>
 				</el-row>
 				<el-row>
+                    <el-col :span="12">
+						<el-form-item label="出生日期">
+							<el-date-picker class="input-class"   type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+						</el-form-item>
+					</el-col>
 					<el-col :span="12">
 							<el-form-item label="年龄">
 								<el-input-number   v-model="addForm.age" :min="0" :max="200"></el-input-number>
 							</el-form-item>
 					</el-col>
-					<el-col :span="12">
-						<el-form-item label="出生日期">
-							<el-date-picker    type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
-						</el-form-item>
-					</el-col>
+					
                     
 				</el-row>
 				<el-row>
+                    <el-col :span="12">
+                        <el-form-item label="联系方式" prop="phone">
+                            <el-input type="text" v-model="addForm.phone"></el-input>
+                        </el-form-item>
+					</el-col>
 					<el-col :span="12">
 						<el-form-item label="是否在职" prop="jobState">
                             <el-radio-group    v-model="addForm.jobState">
@@ -108,7 +116,27 @@
 							</el-radio-group>
 						</el-form-item>
 					</el-col>
+					
+				</el-row>
+				<el-row>
+                    <el-col :span="12">
+                        <el-form-item label="用户名" prop="userAccount">
+                            <el-input  v-model="addForm.userAccount" placeholder="请填写用户名"/>
+                        </el-form-item>
+                    </el-col>
 					<el-col :span="12">
+						<el-form-item label="用户密码" prop="userPasswd"> 
+							<el-input    v-model="addForm.userPasswd" placeholder="用户密码"></el-input>
+						</el-form-item>
+					</el-col>
+				</el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="教练编号" prop="coachNo">
+                            <el-input type="text" v-model="addForm.coachNo"/>
+                        </el-form-item>
+					</el-col>
+                    <el-col :span="12">
                         <el-form-item label="所在场馆" prop="gymId">
 							<el-select v-model="addForm.gymId" filterable placeholder="请选择">
                                 <el-option
@@ -120,28 +148,16 @@
                             </el-select>
                         </el-form-item>
 					</el-col>
-				</el-row>
-				<el-row>
-                    <el-col :span="12">
-                        <el-form-item label="用户名" prop="userAccount">
-                            <el-input  v-model="addForm.userAccount" placeholder="请填写用户名"/>
-                        </el-form-item>
-                    </el-col>
-					<el-col :span="24">
-						<el-form-item label="用户密码" prop="userPasswd"> 
-							<el-input    v-model="addForm.userPasswd" placeholder="用户密码"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
+                </el-row>
                 <el-row>
                     <el-col :span="24">
-                        <el-form-item label="项目" prop="courseIdArr">
+                        <el-form-item label="教授课程" prop="courseIdArr">
                             <el-select v-model="addForm.courseIdArr"  multiple filterable placeholder="请选择">
                                 <el-option
                                 v-for="item in courseList"
-                                :key="item.courseNo"
+                                :key="item.id"
                                 :label="item.courseName"
-                                :value="item.courseNo">
+                                :value="item.id">
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -173,25 +189,46 @@
 					
 				</el-row>
 				<el-row>
+                    <el-col :span="12">
+						<el-form-item label="出生日期" >
+							<span v-text=" coach.birth"></span>
+						</el-form-item>
+					</el-col>
 					<el-col :span="12">
 							<el-form-item label="年龄">
 								<span v-text="coach.age"></span>
 							</el-form-item>
 					</el-col>
 					
-					<el-col :span="12">
-						<el-form-item label="出生日期" >
-							<span v-text=" coach.birth"></span>
-						</el-form-item>
-					</el-col>
+					
 				</el-row>
 				<el-row>
+                    <el-col :span="12">
+                        <el-form-item label="联系方式">
+                           <span v-text="coach.phone"></span>
+						</el-form-item>
+					</el-col>
 					<el-col :span="12">
 						<el-form-item label="是否在职">
                            <span>{{coach.jobState | parseJobState}}</span>
 						</el-form-item>
 					</el-col>
+				</el-row>
+				<el-row>
 					<el-col :span="12">
+						<el-form-item label="用户名" > 
+							<span v-text="coach.userAccount"></span>
+						</el-form-item>
+					</el-col>
+                </el-row>
+                
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="教练编号">
+                            <span v-text="coach.coachNo"></span>
+                        </el-form-item>
+					</el-col>
+                    <el-col :span="12">
                         <el-form-item label="所在场馆">
 							<el-select v-model="coach.gymId" disabled filterable placeholder="请选择">
                                 <el-option
@@ -203,21 +240,16 @@
                             </el-select>
                         </el-form-item>
 					</el-col>
-				</el-row>
-				<el-row>
-					<el-col :span="12">
-						<el-form-item label="用户名" > 
-							<span v-text="coach.userAccount"></span>
-						</el-form-item>
-					</el-col>
+                </el-row>
+                <el-row>
                     <el-col :span="12">
-					<el-form-item label="项目">
+					    <el-form-item label="教授课程">
                             <el-select v-model="coachCourseArr" disabled multiple filterable placeholder="请选择">
                                 <el-option
                                 v-for="item in courseList"
-                                :key="item.courseNo"
+                                :key="item.id"
                                 :label="item.courseName"
-                                :value="item.courseNo">
+                                :value="item.id">
                                 </el-option>
                             </el-select>
                         </el-form-item>
@@ -253,7 +285,7 @@ export default {
             page:1,
             pageSize:20,
             coachList: [],
-            courseList:[{courseNo:'',courseName:'请选择'}],
+            courseList:[],
             gymList:[{id:-1,gymName:"请选择"}],
             formType:'add',
             formTypeObj:{
@@ -275,6 +307,8 @@ export default {
                 gymId:'',
                 userAccount:'',
                 userPasswd:'',
+                coachNo:'',
+                phone:'',
                 courseIdArr:[]
             },
             addFormRules:{
@@ -282,8 +316,27 @@ export default {
                     { required: true, message: '请输入姓名', trigger: 'blur' },
                     { min: 2, message: '长度在 2 个字符以上', trigger: 'blur' }
                 ],
-                
-
+                phone:[
+                    { required: true, message: '请输入联系方式', trigger: 'blur' },
+                ],
+                sex:[
+                    { required: true, message: '请选择性别', trigger: 'blur' }, 
+                ],
+                coachNo:[
+                    { required: true, message: '请输入教练编号', trigger: 'blur' }, 
+                ],
+                gymId:[
+                    { required: true, message: '请选择场馆', trigger: 'blur' }, 
+                ],
+                userAccount:[
+                    { required: true, message: '请输入用户名', trigger: 'blur' }, 
+                ],
+                userPasswd:[
+                    { required: true, message: '请输入用户密码', trigger: 'blur' }, 
+                ],
+                courseIdArr:[
+                     { required: true, message: '请输入选择教授课程', trigger: 'blur' }, 
+                ]
                 
             },
             formNameObj:{
@@ -299,6 +352,8 @@ export default {
                 gymId:-1,
                 userAccount:'',
                 userPasswd:'',
+                 coachNo:'',
+                phone:'',
                 courseIdArr:[]
             },
             detailVisible:false,
@@ -414,7 +469,7 @@ export default {
                         
                         this.addForm.courseIdArr = []
                         res.data.data.forEach(item => {
-                            this.addForm.courseIdArr.push(item.courseNo)
+                            this.addForm.courseIdArr.push(item.id)
                         });
 
                         this.coachCourseArr = this.addForm.courseIdArr

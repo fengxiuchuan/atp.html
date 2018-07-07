@@ -19,7 +19,7 @@
 			<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 				<el-form :inline="true">
 					<el-form-item>
-							<el-button type="primary" @click="handleAdd">新增</el-button>
+						<el-button type="primary" @click="handleAdd">新增</el-button>
 					</el-form-item>
 				</el-form>
 			</el-col>
@@ -40,8 +40,10 @@
 				</el-table-column>
 				<el-table-column prop="address" label="地址" min-width="180" sortable>
 				</el-table-column>
-				<el-table-column label="操作" width="150">
+				<el-table-column label="操作" >
 					<template scope="scope">
+						<!-- <el-button size="small" @click="reCharge(scope.$index, scope.row)">充值</el-button>
+						<el-button size="small" @click="consume(scope.$index, scope.row)">销课</el-button> -->
 						<el-button size="small" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
 						<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					</template>
@@ -423,7 +425,7 @@ export default {
 
 			if(this.formTypeObj.view === formTppe ){
 				this.formTitle = "查看详情";
-				this.formType = this.formTypeObj.edit;
+				this.formType = this.formTypeObj.detail;
 				this.readOnly = false;
 				this.cancelLabel = '取消';
 				this.showSubmit = false;

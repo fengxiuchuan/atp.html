@@ -15,4 +15,7 @@ const urlUpdateCoach = '/atpCoach/updateCoach.do'
 // 删除课程
 const urlDelCoachCourseById = '/atpCoach/delCoachCourseById.do'
 
-export {urlAddCoach, urlQueryAllList, urlQueryCourseByCoachId, urlQueryDetailById, urlUpdateCoach, urlDelCoachCourseById}
+// 查询教练集合
+const urlGetCoachList = '/atpCoach/queryDetailById.json'
+
+export {urlAddCoach, urlQueryAllList, urlQueryCourseByCoachId, urlQueryDetailById, urlUpdateCoach, urlDelCoachCourseById, urlGetCoachList}
