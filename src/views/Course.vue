@@ -46,7 +46,7 @@
 		
 
 		<!--工具条-->
-		<pagination @search="pageSearch" :total="total" :currentPage = "page"></pagination>
+		<pagination @search="pageSearch" :total="total" :currentPage ="page"></pagination>
         <!--新增、编辑课程-->
         <el-dialog :title="formTitle"  :visible.sync="addFormVisible" :close-on-click-modal="true">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" >

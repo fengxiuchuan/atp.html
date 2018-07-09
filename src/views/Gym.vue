@@ -285,13 +285,25 @@ export default {
         },
         getGymDetailById:function(gymId){
              let para = {gymId : gymId}
-             this.$http.post(urlQueryCourseListByGymId, para, res => {
+             this.$http.post(urlQueryDetailById, para, res => {
                     this.addLoading = false;
                     if(res && res.data && 'A_SYS_00010' === res.data.code){
                        this.addForm  = Object.assign({},res.data.data)
                        this.gym = Object.assign({},res.data.data)
-                       this.getGymCoachList(gymId);
-                       this.getGymCourseArr(gymId);
+                       this.addForm.courseIdArr = []
+                      
+                       let courseList = res.data.data.courseList;
+                       let coachList = res.data.data.coachlist;
+                       if(courseList){
+                           courseList.forEach(item => {
+                               this.addForm.courseIdArr.push(item.id)
+                           })
+                       }
+                       if(coachList){
+                           this.coachList = coachList
+                       }
+                       //this.getGymCoachList(gymId);
+                       //this.getGymCourseArr(gymId);
                     }else{
                        this.addForm.courseIdArr = [];
                     }
@@ -309,8 +321,8 @@ export default {
         },
         handleEdit:function(index,row){
             this.changeGymConstants(this.formObj.edit.formType)
+            this.getGymDetailById(row.id);
             this.addFormVisible = true;
-            this.addForm = Object.assign({},row)
            
         },
         handleView:function(index,row){

@@ -133,6 +133,11 @@
 						</el-form-item>
 					</el-col>
 				</el-row>
+				<el-row>
+					<template scope>
+						<Recharge @changeSelectedCourses="changeSelectedCourses" :selectedCourseList="selectedCourseList" ></Recharge>
+					</template>
+				</el-row>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">{{ cancelLabel }}</el-button>
@@ -264,8 +269,10 @@ import
  urlGetMemById, 
  urlGetCourseListByMemId
  } from "../api/req_member";
+ import {urlQueryCourseByCoachId} from '../api/req_coach'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
+import Recharge from './Recharge'
 //import NProgress from 'nprogress'
  
 export default {
@@ -341,7 +348,8 @@ export default {
 			address: '',
 			remark:'',
 		},
-		courseList:[]
+		courseList:[],
+		selectedCourseList:[]
     };
   },
   filters:{
@@ -355,14 +363,14 @@ export default {
 	  }
   },
   methods: {
-	   parseSex:function(sex){
-		 if(0 === sex){
-			 return "女"
-		 }
-		 if(1 === sex){
-			 return "男"
-		 }
-	  },
+	parseSex:function(sex){
+		if(0 === sex){
+			return "女"
+		}
+		if(1 === sex){
+			return "男"
+		}
+	},
     //性别显示转换
     formatSex: function(row, column) {
       return row.sex == 1 ? "男" : row.sex == 0 ? "女" : "未知";
@@ -380,150 +388,170 @@ export default {
 	  this.searchForm.pageSize = this.pageSize;
 	  let para = Object.assign({}, this.searchForm);
       this.listLoading = true;
-			// 请求后台
-			this.$http.post(urlMemberList, para, res => {
-				if(res.data.code =='A_SYS_00010'){
-						this.members = res.data.data.rows;
-						this.total = res.data.data.total;
-						this.page = res.data.data.page;
-				}else{
-						this.members = [];
-						this.total = 0;
-						this.page = 1;
-				}
-				
-				this.listLoading = false;
-			});
-		},
-		
-		// 新增按钮
-		handleAdd:function(){
-			this.addFormVisible = true;
-			this.changeInitData(this.formTypeObj.add);
-			this.addForm = {
-				name:'',
-				sex: -1,
-				age: 0,
-				birth: '',
-				address: '',
-				phone:''
+		// 请求后台
+		this.$http.post(urlMemberList, para, res => {
+			if(res.data.code =='A_SYS_00010'){
+					this.members = res.data.data.rows;
+					this.total = res.data.data.total;
+					this.page = res.data.data.page;
+			}else{
+					this.members = [];
+					this.total = 0;
+					this.page = 1;
 			}
-		},
-		changeInitData:function(formTppe){
-			if(this.formTypeObj.add=== formTppe ){
-				this.formTitle = "新增";
-				this.formType = this.formTypeObj.add;
-				this.readOnly = false;
-				this.showSubmit = true;
-			}
-			if(this.formTypeObj.edit=== formTppe ){
-				this.formTitle = "编辑";
-				this.formType = this.formTypeObj.edit;
-				this.readOnly = false;
-				this.showSubmit = true;
-			}
-
-			if(this.formTypeObj.view === formTppe ){
-				this.formTitle = "查看详情";
-				this.formType = this.formTypeObj.detail;
-				this.readOnly = false;
-				this.cancelLabel = '取消';
-				this.showSubmit = false;
-			}
-		},
-		// 编辑按钮
-		//显示编辑界面
-		handleEdit: function (index, row) {
-			this.addFormVisible = true;
-			this.changeInitData(this.formTypeObj.edit);
-			//查询
-			this.addForm = Object.assign({}, row);
 			
-		},
-		// 会员详情
-		handleDetail: function(index, row) {
-			this.detailLoading = true;
-			let id = row.id;
-			this.getMemById(id);
-			this.getCourseListByMemId(id);
-			this.detailLoading = false;
-			this.detailVisible = true;
-		},
-		getCourseListByMemId: function(memberId){
-			if(!memberId){
-				return;
-			}
-			let para = {memberId: memberId}
-			this.$http.get(urlGetCourseListByMemId, para, res => {
-				this.addLoading = false;
-				if(res && res.data && res.data.code === 'A_SYS_00010'){
-					this.courseList = res.data.data;
-				}else{
-					this.$message({
-						message: res.data.msg,
-						type: 'warning'
-					});
-				}
+			this.listLoading = false;
+		});
+	},
+	
+	// 新增按钮
+	handleAdd:function(){
+		this.addFormVisible = true;
+		this.changeInitData(this.formTypeObj.add);
+		this.addForm = {
+			name:'',
+			sex: -1,
+			age: 0,
+			birth: '',
+			address: '',
+			phone:''
+		}
+	},
+	changeInitData:function(formTppe){
+		if(this.formTypeObj.add=== formTppe ){
+			this.formTitle = "新增";
+			this.formType = this.formTypeObj.add;
+			this.readOnly = false;
+			this.showSubmit = true;
+		}
+		if(this.formTypeObj.edit=== formTppe ){
+			this.formTitle = "编辑";
+			this.formType = this.formTypeObj.edit;
+			this.readOnly = false;
+			this.showSubmit = true;
+		}
 
-			});
-		},
-		getMemById: function(memberId){
-			if(!memberId){
-				return;
+		if(this.formTypeObj.view === formTppe ){
+			this.formTitle = "查看详情";
+			this.formType = this.formTypeObj.detail;
+			this.readOnly = false;
+			this.cancelLabel = '取消';
+			this.showSubmit = false;
+		}
+	},
+	// 编辑按钮
+	//显示编辑界面
+	handleEdit: function (index, row) {
+		this.addFormVisible = true;
+		this.changeInitData(this.formTypeObj.edit);
+		//查询
+		this.addForm = Object.assign({}, row);
+		
+	},
+	// 会员详情
+	handleDetail: function(index, row) {
+		this.detailLoading = true;
+		let id = row.id;
+		this.getMemById(id);
+		this.getCourseListByMemId(id);
+		this.detailLoading = false;
+		this.detailVisible = true;
+	},
+	getCourseListByMemId: function(memberId){
+		if(!memberId){
+			return;
+		}
+		let para = {memberId: memberId}
+		this.$http.get(urlGetCourseListByMemId, para, res => {
+			this.addLoading = false;
+			if(res && res.data && res.data.code === 'A_SYS_00010'){
+				this.courseList = res.data.data;
+			}else{
+				this.$message({
+					message: res.data.msg,
+					type: 'warning'
+				});
 			}
-			let para = {memberId: memberId}
-			this.$http.get(urlGetMemById, para, res => {
-				this.addLoading = false;
-				if(res && res.data && res.data.code === 'A_SYS_00010'){
-					this.member = Object.assign({},res.data.data);
-				}else{
-					this.$message({
-						message: res.data.msg,
-						type: 'warning'
-					});
-				}
 
-			});
-		},
-		addSubmit:function(){
-			this.$refs['addForm'].validate((valid) => {
-				if(valid){
-						this.$confirm("确认提交么？",'提示',{
-						confirmButtonText: '确定',
-						cancelButtonText: '取消',
-						type: 'info '
-						}).then(() => {
-							this.addLoading = true;
-							let submitURL = urlAddMember;
-							if(formTypeObj.edit=== this.formType){
-								submitURL = urlUpdateMember;
-							}
+		});
+	},
+	getMemById: function(memberId){
+		if(!memberId){
+			return;
+		}
+		let para = {memberId: memberId}
+		this.$http.get(urlGetMemById, para, res => {
+			this.addLoading = false;
+			if(res && res.data && res.data.code === 'A_SYS_00010'){
+				this.member = Object.assign({},res.data.data);
+			}else{
+				this.$message({
+					message: res.data.msg,
+					type: 'warning'
+				});
+			}
+
+		});
+	},
+	addSubmit:function(){
+		this.$refs['addForm'].validate((valid) => {
+			if(valid){
+					this.$confirm("确认提交么？",'提示',{
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					type: 'info '
+					}).then(() => {
+						this.addLoading = true;
+						let submitURL = urlAddMember;
+						if(formTypeObj.edit=== this.formType){
+							submitURL = urlUpdateMember;
+						}
+						
+						let para = Object.assign({}, this.addForm);
+						para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+						this.$http.post(submitURL, para, res => {
+							this.addLoading = false;
+							if(res && res.data && res.data.code === 'A_SYS_00010'){
 							
-							let para = Object.assign({}, this.addForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							this.$http.post(submitURL, para, res => {
-								this.addLoading = false;
-								if(res && res.data && res.data.code === 'A_SYS_00010'){
-								
-									this.$message({
-										message: res.data.msg,
-										type: 'success'
-									});
-									this.$refs['addForm'].resetFields();
-									this.addFormVisible = false;
-									this.getUsers();
-								}else{
-									this.$message({
-										message: res.data.msg,
-										type: 'warning'
-									});
-								}
+								this.$message({
+									message: res.data.msg,
+									type: 'success'
+								});
+								this.$refs['addForm'].resetFields();
+								this.addFormVisible = false;
+								this.getUsers();
+							}else{
+								this.$message({
+									message: res.data.msg,
+									type: 'warning'
+								});
+							}
 
-							});
-						})
+						});
+					})
+			}
+		})
+	},
+	changeSelectedCourses:function(index,selectedCourseList,courseIdArr){
+
+		if(selectedCourseList != null && courseIdArr != null ){
+			this.$http.post(urlQueryCourseByCoachId, para, res => {
+				
+				if(res && res.data && res.data.code === 'A_SYS_00010'){
+					selectedCourseList[i].coachList = res.data.data;
+					this.selectedCourseList = selectedCourseList;
+				}else{
+					this.$message({
+						message: res.data.msg,
+						type: 'warning'
+					});
 				}
-			})
-		},
+
+			});
+		}else{
+			this.selectedCourseList = []
+		}
+	},
 	pageSearch:function(pageination){
 			this.page = pageination.page;
 			this.pageSize = pageination.pageSize;
@@ -536,7 +564,8 @@ export default {
     this.getUsers();
   },
 	components:{
-		'pagination':Pageination
+		'pagination':Pageination,
+		'Recharge':Recharge
 	}
 };
 </script>
