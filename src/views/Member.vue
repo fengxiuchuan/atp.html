@@ -134,9 +134,14 @@
 					</el-col>
 				</el-row>
 				<el-row>
-					<template scope>
-						<Recharge @changeSelectedCourses="changeSelectedCourses" :selectedCourseList="selectedCourseList" ></Recharge>
-					</template>
+					<el-col :span="24">
+						<el-form-item label="报名课程">
+							<template scope>
+								<Recharge @changeSelectedCourses="changeSelectedCourses" @addMemCourse="addMemCourse" :memCourselist="selectedCourseList" ></Recharge>
+							</template>
+						</el-form-item>
+					</el-col>
+					
 				</el-row>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -269,7 +274,8 @@ import
  urlGetMemById, 
  urlGetCourseListByMemId
  } from "../api/req_member";
- import {urlQueryCourseByCoachId} from '../api/req_coach'
+import {urlQueryCourseByCoachId,urlGetCoachList} from '../api/req_coach'
+import {urlGetCourseList} from '../api/req_course'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
 import Recharge from './Recharge'
@@ -349,6 +355,7 @@ export default {
 			remark:'',
 		},
 		courseList:[],
+		coachList:[],
 		selectedCourseList:[]
     };
   },
@@ -532,14 +539,14 @@ export default {
 			}
 		})
 	},
-	changeSelectedCourses:function(index,selectedCourseList,courseIdArr){
+	changeSelectedCourses:function(index,courseIdArr){
 
-		if(selectedCourseList != null && courseIdArr != null ){
+		if(this.selectedCourseList != null && courseIdArr != null ){
 			this.$http.post(urlQueryCourseByCoachId, para, res => {
 				
 				if(res && res.data && res.data.code === 'A_SYS_00010'){
 					selectedCourseList[i].coachList = res.data.data;
-					this.selectedCourseList = selectedCourseList;
+					
 				}else{
 					this.$message({
 						message: res.data.msg,
@@ -552,16 +559,42 @@ export default {
 			this.selectedCourseList = []
 		}
 	},
+	addMemCourse:function(){
+		console.log(this.selectedCourseList)
+		this.selectedCourseList.push({courseList:this.courseList,coachList:[]})
+		console.log(this.selectedCourseList)
+	},
 	pageSearch:function(pageination){
 			this.page = pageination.page;
 			this.pageSize = pageination.pageSize;
 			this.total = pageination.total;
 			this.getUsers()
 	},
-		
+	initCourseList: function(){
+		this.$http.post(urlGetCourseList, {}, res => {
+			if(res && res.data && 'A_SYS_00010' === res.data.code){
+				this.courseList = res.data.data;
+			}else{
+				this.courseList = [];
+			}
+
+		});
+	},
+	initCoachList:function(){
+		this.$http.post(urlGetCoachList, {}, res => {
+			if(res && res.data && 'A_SYS_00010' === res.data.code){
+				this.coachList = res.data.data;
+			}else{
+				this.coachList = [];
+			}
+
+		});
+	}
   },
   mounted() {
-    this.getUsers();
+	this.getUsers();
+	this.initCourseList();
+	this.initCoachList();
   },
 	components:{
 		'pagination':Pageination,
