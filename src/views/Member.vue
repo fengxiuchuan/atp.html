@@ -25,20 +25,36 @@
 			</el-col>
 
 			<!--列表-->
-			<el-table :data="members" highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
-				<el-table-column type="selection" width="55">
-				</el-table-column>
+			<el-table :data="members" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
+				
 				<el-table-column type="index" width="60">
 				</el-table-column>
-				<el-table-column prop="name" label="姓名" width="120" sortable>
+				<el-table-column prop="name" label="姓名" width="120">
+					<template slot-scope="scope">
+						<el-popover trigger="hover" placement="top">
+						<p>姓名: {{ scope.row.name }}</p>
+						<p>电话: {{ scope.row.phone }}</p>
+						<p>住址: {{ scope.row.address }}</p>
+						<div slot="reference" class="name-wrapper">
+							<el-tag size="medium">{{ scope.row.name }}</el-tag>
+						</div>
+						</el-popover>
+					</template>
 				</el-table-column>
-				<el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable>
+				<el-table-column prop="cardNo" label="会员卡号" >
 				</el-table-column>
-				<el-table-column prop="age" label="年龄" width="100" sortable>
+				<el-table-column prop="sex" label="性别"   >
+					<template slot-scope="scope">
+						<div>
+							<i  class="atp-web-sex"></i>
+						</div>
+					</template>
 				</el-table-column>
-				<el-table-column prop="phone" label="手机号码" width="120" sortable>
+				<el-table-column prop="age" label="年龄" >
 				</el-table-column>
-				<el-table-column prop="address" label="地址" min-width="180" sortable>
+				<el-table-column prop="totalBuy" label="累计消费"  >
+				</el-table-column>
+				<el-table-column prop="totalIntegral" label="总积分">
 				</el-table-column>
 				<el-table-column label="操作" >
 					<template scope="scope">
@@ -55,9 +71,9 @@
 		<pagination @search="pageSearch" :total="total" :currentPage = "page"></pagination>
 
 		<!--新增界面-->
-		<el-dialog :title="formTitle"  :visible.sync="addFormVisible" :close-on-click-modal="true">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" >
-				<el-input type="hidden" v-model="addForm.id"></el-input>
+		<el-dialog :title="formTitle"  :visible.sync="addFormVisible" :close-on-click-modal="true" width="900px">
+			<el-form :model="addForm" label-width="100px" :rules="formRules" ref="addForm" >
+			
 				<el-row>
 					<el-col :span="12">
 						<el-form-item label="姓名" prop="name">
@@ -100,14 +116,25 @@
 					</el-col>
 				</el-row>
 				<el-row>
-					<el-col :span="24">
+					<el-col :span="12">
 						<el-form-item label="会员卡号" prop="cardNo"> 
 							<el-input  :readonly="readOnly"  v-model="addForm.cardNo" placeholder="会员卡号"></el-input>
 						</el-form-item>
 					</el-col>
-					
+					<el-col :span="12">
+						<el-form-item label="状态" prop="cardState"> 
+							 <el-select v-model="addForm.cardState"   filterable placeholder="请选择">
+								<el-option
+								v-for="item in cardStateArr"
+								:key="item.value"
+								:label="item.label"
+								:value="item.value" >
+								</el-option>
+							</el-select>
+						</el-form-item>
+					</el-col>
 				</el-row>
-				<el-row>
+				<el-row v-if="showPasswd">
 					<el-col :span="12">
 						<el-form-item label="会员密码" prop="cardPwd">
 							<el-input  :readonly="readOnly"  type="password" v-model="addForm.cardPwd" placeholder="请填写密码"></el-input>
@@ -133,11 +160,11 @@
 						</el-form-item>
 					</el-col>
 				</el-row>
-				<el-row>
+				<el-row v-if="showUserCourseForm">
 					<el-col :span="24">
 						<el-form-item label="报名课程">
 							<template scope>
-								<Recharge @changeSelectedCourses="changeSelectedCourses" @addMemCourse="addMemCourse" :memCourselist="selectedCourseList" ></Recharge>
+								<Recharge  @addMemCourse="addMemCourse" @refreshSelectedCourses="refreshSelectedCourses" :memCourselist="selectedCourseList" ></Recharge>
 							</template>
 						</el-form-item>
 					</el-col>
@@ -152,7 +179,7 @@
 
 		
 		<!--详情页面-->
-		<el-dialog title="会员详情"  :visible.sync="detailVisible" :close-on-click-modal="true" :loading="detailLoading">
+		<el-dialog title="会员详情" with="900px"  :visible.sync="detailVisible" :close-on-click-modal="true" :loading="detailLoading">
 			<el-form  label-width="100px" label-suffix="：" >
 				<el-row>
 					<el-col :span="12">
@@ -176,7 +203,7 @@
 					
 					<el-col :span="12">
 						<el-form-item label="性别" >
-							<span v-text=" member.sex | parseSex"></span>
+							<span>{{member.sex | parseSex}}</span>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -193,12 +220,16 @@
 					</el-col>
 				</el-row>
 				<el-row>
-					<el-col :span="24">
+					<el-col :span="12">
 						<el-form-item label="会员卡号" > 
 							<span v-text="member.cardNo"></span>
 						</el-form-item>
 					</el-col>
-					
+					<el-col :span="12">
+						<el-form-item label="卡片状态" > 
+							<span>{{member.cardState | paraseCardState}}</span>
+						</el-form-item>
+					</el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="24">
@@ -222,7 +253,11 @@
 				</el-col>
 				<el-col :span="24">
 					<el-table
-						:data="courseList"
+						boder
+						stripe
+						 :summary-method="getSummaries"
+    					show-summary
+						:data="memCourseList"
 						style="width: 100%">
 						<el-table-column
 							prop="orderNo"
@@ -274,16 +309,27 @@ import
  urlGetMemById, 
  urlGetCourseListByMemId
  } from "../api/req_member";
-import {urlQueryCourseByCoachId,urlGetCoachList} from '../api/req_coach'
-import {urlGetCourseList} from '../api/req_course'
+import {urlGetCoachListByCourseId,urlGetCoachList} from '../api/req_coach'
+import {urlGetCourseList,urlGetGymCourseList} from '../api/req_course'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
 import Recharge from './Recharge'
-//import NProgress from 'nprogress'
+
  
 export default {
   data() {
+	var validatePass = (rule, value, callback) => {
+	if (value === '') {
+		callback(new Error('请再次输入密码'));
+	} else if (value !== this.addForm.cardPwd) {
+		callback(new Error('两次输入密码不一致!'));
+	} else {
+		callback();
+	}
+	};
     return {
+		showPasswd:true,
+		showUserCourseForm:true,
 		searchForm: {
 			name: "",
 			page:1,
@@ -314,13 +360,14 @@ export default {
 			address: '',
 			phone:''
 		},
+		formRules:{},
 		addFormRules:{
 			name:[
 				{ required: true, message: '请输入姓名', trigger: 'blur' },
 				{ min: 2, message: '长度在 2 个字符以上', trigger: 'blur' }
 			],
 			sex:[
-				{required:	true,	message:"请选择性别",trigger: 'change'}
+				{required:	true,	message:"请选择性别",trigger: 'blur'}
 			],
 			phone:[
 				{required: true, message: '请输入手机号', trigger: 'blur'}
@@ -335,11 +382,39 @@ export default {
 				{required: true, message: '请输入密码', trigger: 'blur'}
 			],
 			repeatPwd:[
-				{required: true, message: '请重复密码', trigger: 'blur'}
+				{required: true,validator: validatePass, message: '请重复密码', trigger: 'blur'}
+			],
+			cardState:[
+				{required: true, message: '请选择卡片状态', trigger: 'blur'}
 			]
-		
+		},
+		editFormRules:{
+			name:[
+				{ required: true, message: '请输入姓名', trigger: 'blur' },
+				{ min: 2, message: '长度在 2 个字符以上', trigger: 'blur' }
+			],
+			sex:[
+				{required:	true,	message:"请选择性别",trigger: 'blur'}
+			],
+			phone:[
+				{required: true, message: '请输入手机号', trigger: 'blur'}
+			],
+			idCard:[
+				{required: true, message: '请输入身份证号码', trigger: 'blur'}
+			],
+			cardNo:[
+				{required: true, message: '请输入会员卡号', trigger: 'blur'}
+			],
+			cardState:[
+				{required: true, message: '请选择卡片状态', trigger: 'blur'}
+			]
 			
 		},
+		cardStateArr:[
+			{label:'正常',value:'USED'},
+			{label:'挂失',value:'LOSE'},
+			{label:'过期',value:'EXPIRE'},
+		],
 		detailVisible:false,
 		detailLoading: false,
 		// 单个会员详情
@@ -355,7 +430,7 @@ export default {
 			remark:'',
 		},
 		courseList:[],
-		coachList:[],
+		memCourseList:[],
 		selectedCourseList:[]
     };
   },
@@ -367,9 +442,54 @@ export default {
 		 if(1 === sex){
 			 return "男"
 		 }
+	  },
+	  paraseCardState:function(cardState){
+		if('USED' === cardState){
+			return '正常'
+		}
+		if('LOSE'=== cardState){
+			return '挂失'
+		}
+		if('EXPIRE' === cardState){
+			return '过期'
+		}
+		 
 	  }
   },
   methods: {
+	getSummaries(param) {
+	const { columns, data } = param;
+	const sums = [];
+	columns.forEach((column, index) => {
+		if (index === 0) {
+			sums[index] = '合计';
+			return;
+		}
+		if(index === 2 || index == 3){
+			sums[index] = '';
+		}
+		const values = data.map(item => Number(item[column.property]));
+		if (!values.every(value => isNaN(value))) {
+		sums[index] = values.reduce((prev, curr) => {
+			const value = Number(curr);
+			if (!isNaN(value)) {
+				return prev + curr;
+			} else {
+				return prev;
+			}
+		}, 0);
+			if(index === 1){
+				sums[index] = "¥" +sums[index]
+			}else{
+				sums[index]+='课时'
+			}
+		} else {
+			sums[index] = '';
+		}
+	});
+
+	return sums;
+	},
 	parseSex:function(sex){
 		if(0 === sex){
 			return "女"
@@ -423,6 +543,7 @@ export default {
 			address: '',
 			phone:''
 		}
+		this.selectedCourseList=[]
 	},
 	changeInitData:function(formTppe){
 		if(this.formTypeObj.add=== formTppe ){
@@ -430,12 +551,19 @@ export default {
 			this.formType = this.formTypeObj.add;
 			this.readOnly = false;
 			this.showSubmit = true;
+			this.memCourseList = [];
+			this.formRules = this.addFormRules;
+			this.showPasswd = true;
+			this.showUserCourseForm = true;
 		}
 		if(this.formTypeObj.edit=== formTppe ){
 			this.formTitle = "编辑";
 			this.formType = this.formTypeObj.edit;
 			this.readOnly = false;
 			this.showSubmit = true;
+			this.formRules = this.editFormRules;
+			this.showPasswd = false;
+			this.showUserCourseForm = false;
 		}
 
 		if(this.formTypeObj.view === formTppe ){
@@ -472,7 +600,7 @@ export default {
 		this.$http.get(urlGetCourseListByMemId, para, res => {
 			this.addLoading = false;
 			if(res && res.data && res.data.code === 'A_SYS_00010'){
-				this.courseList = res.data.data;
+				this.memCourseList = res.data.data;
 			}else{
 				this.$message({
 					message: res.data.msg,
@@ -510,10 +638,10 @@ export default {
 					}).then(() => {
 						this.addLoading = true;
 						let submitURL = urlAddMember;
-						if(formTypeObj.edit=== this.formType){
+						if(this.formTypeObj.edit=== this.formType){
 							submitURL = urlUpdateMember;
 						}
-						
+						console.log(this.addForm)
 						let para = Object.assign({}, this.addForm);
 						para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
 						this.$http.post(submitURL, para, res => {
@@ -539,30 +667,23 @@ export default {
 			}
 		})
 	},
-	changeSelectedCourses:function(index,courseIdArr){
-
-		if(this.selectedCourseList != null && courseIdArr != null ){
-			this.$http.post(urlQueryCourseByCoachId, para, res => {
-				
-				if(res && res.data && res.data.code === 'A_SYS_00010'){
-					selectedCourseList[i].coachList = res.data.data;
-					
-				}else{
-					this.$message({
-						message: res.data.msg,
-						type: 'warning'
-					});
-				}
-
-			});
-		}else{
-			this.selectedCourseList = []
-		}
-	},
 	addMemCourse:function(){
-		console.log(this.selectedCourseList)
 		this.selectedCourseList.push({courseList:this.courseList,coachList:[]})
-		console.log(this.selectedCourseList)
+	},
+	refreshSelectedCourses:function(selectedCourseList){
+		if(!selectedCourseList){
+			return;
+		}
+		this.addForm.courseIdArr=[]
+		this.addForm.coachIdArr=[]
+		this.addForm.totalNumArr=[]
+		this.addForm.courseAmountArr=[]
+		selectedCourseList.forEach(item => {
+			this.addForm.courseIdArr.push(item.courseIdArr)
+			this.addForm.coachIdArr.push(item.coachIdArr)
+			this.addForm.totalNumArr.push(item.totalNumArr)
+			this.addForm.courseAmountArr.push(item.courseAmountArr)	
+		});
 	},
 	pageSearch:function(pageination){
 			this.page = pageination.page;
@@ -571,7 +692,7 @@ export default {
 			this.getUsers()
 	},
 	initCourseList: function(){
-		this.$http.post(urlGetCourseList, {}, res => {
+		this.$http.post(urlGetGymCourseList, {}, res => {
 			if(res && res.data && 'A_SYS_00010' === res.data.code){
 				this.courseList = res.data.data;
 			}else{
@@ -580,26 +701,17 @@ export default {
 
 		});
 	},
-	initCoachList:function(){
-		this.$http.post(urlGetCoachList, {}, res => {
-			if(res && res.data && 'A_SYS_00010' === res.data.code){
-				this.coachList = res.data.data;
-			}else{
-				this.coachList = [];
-			}
-
-		});
-	}
+	
   },
   mounted() {
 	this.getUsers();
 	this.initCourseList();
-	this.initCoachList();
+	
   },
-	components:{
+  components:{
 		'pagination':Pageination,
 		'Recharge':Recharge
-	}
+  }
 };
 </script>
 

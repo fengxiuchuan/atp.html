@@ -6,6 +6,7 @@ import Member from '../views/Member.vue'
 import Coach from '../views/Coach.vue'
 import Gym from '../views/Gym.vue'
 import Course from '../views/Course.vue'
+import MemCharge from '../views/MemCharge.vue'
 let routes = [
   {
     path: '/login',
@@ -52,7 +53,8 @@ let routes = [
       { path: '/Member', component: Member, name: '会员管理' },
       { path: '/Coach', component: Coach, name: '教练管理' },
       { path: '/Gym', component: Gym, name: '场馆' },
-      { path: '/Course', component: Course, name: '开设课程' }
+      { path: '/Course', component: Course, name: '开设课程' },
+      { path: '/MemCharge', component: MemCharge, name: '增值服务' }
     ]
   },
   // {

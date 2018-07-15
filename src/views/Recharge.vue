@@ -3,11 +3,8 @@
         
         <!--充值课程列表-->
         <el-table  :data="selectedCourseList" highlight-current-row border   style="width: 100%;"  size="small">
-            <el-table-column  label="订单编号" >
-                <span>自动生成</span>
-            </el-table-column>
             <el-table-column  label="课程名称" >
-                <template scope="scope">
+                <template slot-scope="scope">
                     <el-select name="courseIdArr" v-model="selectedCourseList[scope.$index].courseIdArr" filterable placeholder="请选择" @change="changeCoach(scope.$index, scope.row)">
                         <el-option
                         v-for="item in scope.row.courseList"
@@ -19,8 +16,8 @@
                 </template>
             </el-table-column>
             <el-table-column label="课程教练"  >
-                <template scope="scope">
-                    <el-select name="coachIdArr" v-model="selectedCourseList[scope.$index].coachIdArr"   filterable placeholder="请选择">
+                <template slot-scope="scope">
+                    <el-select name="coachIdArr" v-model="selectedCourseList[scope.$index].coachIdArr" filterable placeholder="请选择" @change="coachChange(scope.$index, scope.row)" >
                         <el-option
                         v-for="item in scope.row.coachList"
                         :key="item.id"
@@ -31,24 +28,27 @@
                 </template>
             </el-table-column>
             <el-table-column label="课时">
-                <el-input type="number" placeholder="请输入课时数" >
-                    <template slot="append">课时</template>
-                </el-input>
+                <template slot-scope="scope">
+                    <el-input name="totalNumArr" v-model="selectedCourseList[scope.$index].totalNumArr" type="text" placeholder="请输入课时数" >
+                    </el-input>
+                </template>
             </el-table-column>
             <el-table-column label="课程费用">
-                <el-input type="number" placeholder="请输入课程费用" >
-                    <template slot="prepend">&yen</template>
-                </el-input>
+                <template slot-scope="scope">
+                    <el-input name="courseAmountArr" v-model="selectedCourseList[scope.$index].courseAmountArr" type="text" placeholder="请输入课程费用" >
+                        <template slot="prepend">&yen</template>
+                    </el-input>
+                </template>
             </el-table-column>
-            <el-table-column label="操作">
-                <template scope="scope">
-                    <el-button size="small" icon="el-icon-edit-outline" @click="delRow(scope.$index, scope.row)"></el-button>
+            <el-table-column label="操作" width="80px">
+                <template slot-scope="scope">
+                    <el-button size="small" icon="el-icon-minus" @click="delRow(scope.$index, scope.row)"></el-button>
                 </template>
             </el-table-column>
            
         </el-table>
-         <div style="margin-top: 20px">
-            <el-button @click="addRow()">添加一行</el-button>
+         <div style="margin-top: 5px">
+            <el-button size="small" icon="el-icon-plus" @click="addRow()">添加报名课程</el-button>
         </div>
     </section>
 </template>
@@ -64,17 +64,39 @@ export default {
     methods:{
         //删除一行
         delRow:function(index,row){
-            this.selectedCourseList.slice(index,1)
+            this.selectedCourseList.splice(index,1)
         },
         changeCoach:function(index,row){
-            this.$emit('changeSelectedCourses',index,row.courseIdArr)
+            let curCourseList = row.courseList;
+            let curCourseId = row.courseIdArr;
+            let curCoachList =  this.getCoachListByCourseId(curCourseList,curCourseId);
+            this.selectedCourseList[index].coachList = curCoachList;
+            this.selectedCourseList[index].coachIdArr = null;
+        },
+        getCoachListByCourseId:function(curCourseList,curCourseId){
+            let coachList = []
+            curCourseList.forEach(element => {
+                if(element.id == curCourseId){
+                    coachList =  element.coachList;
+                    
+                }
+            });
+            return coachList;
+        },
+        coachChange:function(index,row){
+           this.selectedCourseList[index].coachIdArr = row.coachIdArr;
         },
         addRow:function(){
             this.$emit('addMemCourse')
+        },
+        updateSelectdCourse:function(){
+            this.$emit('refreshSelectedCourses',this.selectedCourseList)
         }
     },
-    mounted(){
-        
+    watch:{
+        selectedCourseList:function(val){
+            this.updateSelectdCourse();
+        }
     }
 }
 </script>

@@ -10,4 +10,10 @@ const urlGetMemById = '/atpMember/getMemById.json'
 // 查看会员所报课程
 const urlGetCourseListByMemId = '/atpMember/queryCourseListByMemId.json'
 
-export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId }
+// 查询所有会员
+const urlGetMemberList = '/atpMember/getMemberList.json'
+
+// 会员充值服务
+const urlPayCourse = '/atpMember/payCourse.do'
+
+export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId, urlGetMemberList, urlPayCourse }

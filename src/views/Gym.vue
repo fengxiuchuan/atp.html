@@ -42,7 +42,13 @@
             </el-table-column>
             <el-table-column prop="phone" label="负责人联系方式" >
             </el-table-column>
-            <el-table-column prop="address" label="地址">
+            <el-table-column prop="address"  label="地址">
+                <template slot-scope="scope">
+                    <div>
+                        <i class="el-icon-location-outline"/>
+                        <span v-text="scope.row.address"></span>
+                    </div>
+                </template>
             </el-table-column>
             <el-table-column label="操作" width="200">
                 <template scope="scope">
