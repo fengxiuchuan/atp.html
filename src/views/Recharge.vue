@@ -94,8 +94,11 @@ export default {
         }
     },
     watch:{
-        selectedCourseList:function(val){
-            this.updateSelectdCourse();
+        selectedCourseList:{
+            handler: function (val, oldVal) {
+                this.updateSelectdCourse();
+             },
+            deep: true
         }
     }
 }
