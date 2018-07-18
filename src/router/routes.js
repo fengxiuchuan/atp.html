@@ -7,6 +7,7 @@ import Coach from '../views/Coach.vue'
 import Gym from '../views/Gym.vue'
 import Course from '../views/Course.vue'
 import MemCharge from '../views/MemCharge.vue'
+import ChargeSuc from '../views/ChargeSuc.vue'
 let routes = [
   {
     path: '/login',
@@ -20,6 +21,11 @@ let routes = [
     name: '',
     hidden: true
   },
+  {
+    path: '/chargeSuc',
+    hidden: true,
+    component:ChargeSuc
+  }
   // { path: '/main', component: Main },
   // {
   //   path: '/',
@@ -70,7 +76,8 @@ let routes = [
     path: '*',
     hidden: true,
     redirect: { path: '/404' }
-  }
+  },
+ 
 ]
 
 export default routes
