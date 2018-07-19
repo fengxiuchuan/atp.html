@@ -16,4 +16,7 @@ const urlGetMemberList = '/atpMember/getMemberList.json'
 // 会员充值服务
 const urlPayCourse = '/atpMember/payCourse.do'
 
-export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId, urlGetMemberList, urlPayCourse }
+// 会员销课
+const urlConsumeCourse = '/atpMember/consumeCourse.do'
+
+export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId, urlGetMemberList, urlPayCourse, urlConsumeCourse }

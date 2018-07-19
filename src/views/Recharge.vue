@@ -27,17 +27,33 @@
                     </el-select>
                 </template>
             </el-table-column>
-            <el-table-column label="课时">
+            <el-table-column label="课时单价">
                 <template slot-scope="scope">
-                    <el-input name="totalNumArr" v-model="selectedCourseList[scope.$index].totalNumArr" type="text" placeholder="请输入课时数" >
+                    <el-input  v-model="selectedCourseList[scope.$index].unitPrice" type="text" placeholder="请输入课时单价" @change="changePrice(scope.$index, scope.row)" >
                     </el-input>
                 </template>
             </el-table-column>
-            <el-table-column label="课程费用">
+            <el-table-column label="课时">
                 <template slot-scope="scope">
-                    <el-input name="courseAmountArr" v-model="selectedCourseList[scope.$index].courseAmountArr" type="text" placeholder="请输入课程费用" >
-                        <template slot="prepend">&yen</template>
+                    <el-input v-model="selectedCourseList[scope.$index].totalNumArr" type="text" placeholder="请输入课时数"  @change="changePrice(scope.$index, scope.row)" >
                     </el-input>
+                </template>
+            </el-table-column>
+            
+            <el-table-column label="总价">
+                <template slot-scope="scope">
+                    {{selectedCourseList[scope.$index].courseAmountArr }}
+                </template>
+            </el-table-column>
+            <el-table-column label="优惠价格">
+                <template slot-scope="scope">
+                    <el-input  v-model="selectedCourseList[scope.$index].discountAmount" type="text" placeholder="请输入优惠价格" @change="changePrice(scope.$index, scope.row)">
+                    </el-input>
+                </template>
+            </el-table-column>
+            <el-table-column label="实付">
+                <template slot-scope="scope">
+                     {{selectedCourseList[scope.$index].actualAmount }}
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="80px">
@@ -91,6 +107,22 @@ export default {
         },
         updateSelectdCourse:function(){
             this.$emit('refreshSelectedCourses',this.selectedCourseList)
+        },
+        changePrice:function(index,row){
+            let unitPrice = row.unitPrice;
+            let totalNumArr = row.totalNumArr;
+            let discountAmount = row.discountAmount;
+            if(!unitPrice || !totalNumArr){
+                this.selectedCourseList[index].courseAmountArr = '';
+                this.selectedCourseList[index].actualAmount =  '';
+                return;
+            }
+            let totalPrice = unitPrice * totalNumArr;
+            if(!discountAmount){
+                discountAmount = 0;
+            }
+            this.selectedCourseList[index].courseAmountArr = totalPrice;
+            this.selectedCourseList[index].actualAmount = totalPrice - discountAmount;
         }
     },
     watch:{

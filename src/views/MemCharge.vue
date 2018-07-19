@@ -76,7 +76,7 @@ export default {
     },
     methods:{
         addMemCourse:function(){
-            this.selectedCourseList.push({courseList:this.courseList,coachList:[]})
+            this.selectedCourseList.push({courseList:this.courseList,coachList:[],courseAmountArr:'',actualAmount:''})
         },
         refreshSelectedCourses:function(selectedCourseList){
             if(!selectedCourseList){
@@ -86,11 +86,15 @@ export default {
             this.addForm.coachIdArr=[]
             this.addForm.totalNumArr=[]
             this.addForm.courseAmountArr=[]
+            this.addForm.unitPriceArr = []
+            this.addForm.discountAmountArr = []
             selectedCourseList.forEach(item => {
                 this.addForm.courseIdArr.push(item.courseIdArr)
                 this.addForm.coachIdArr.push(item.coachIdArr)
                 this.addForm.totalNumArr.push(item.totalNumArr)
                 this.addForm.courseAmountArr.push(item.courseAmountArr)	
+                this.addForm.unitPriceArr.push(item.unitPrice) 
+                this.addForm.discountAmountArr.push(item.discountAmount)  
             });
         },  
         // 根据输入内容搜索

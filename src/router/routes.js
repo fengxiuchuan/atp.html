@@ -7,6 +7,7 @@ import Coach from '../views/Coach.vue'
 import Gym from '../views/Gym.vue'
 import Course from '../views/Course.vue'
 import MemCharge from '../views/MemCharge.vue'
+import Consume from '../views/ConsumeCourse.vue'
 import ChargeSuc from '../views/ChargeSuc.vue'
 let routes = [
   {
@@ -23,9 +24,9 @@ let routes = [
   },
   {
     path: '/chargeSuc',
-    hidden: true,
-    component:ChargeSuc
-  }
+    component: ChargeSuc,
+    hidden: true
+  },
   // { path: '/main', component: Main },
   // {
   //   path: '/',
@@ -60,7 +61,8 @@ let routes = [
       { path: '/Coach', component: Coach, name: '教练管理' },
       { path: '/Gym', component: Gym, name: '场馆' },
       { path: '/Course', component: Course, name: '开设课程' },
-      { path: '/MemCharge', component: MemCharge, name: '增值服务' }
+      { path: '/MemCharge', component: MemCharge, name: '增值服务' },
+      { path: '/Consume', component: Consume, name: '消费积分' }
     ]
   },
   // {

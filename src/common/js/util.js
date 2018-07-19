@@ -1,7 +1,7 @@
 var SIGN_REGEXP = /([yMdhsm])(\1*)/g
 var DEFAULT_PATTERN = 'yyyy-MM-dd'
 
-function padding(s, len) {
+function padding (s, len) {
   var len = len - (s + '').length
   for (var i = 0; i < len; i++) {
     s = '0' + s
@@ -11,17 +11,27 @@ function padding(s, len) {
 
 export default {
   getQueryStringByName: function (name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i")
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i')
     var r = window.location.search.substr(1).match(reg)
-    var context = ""
-    if (r != null)
-      context = r[2]
+    var context = ''
+    if (r != null) { context = r[2] }
     reg = null
     r = null
-    return context == null || context === "" || context === "undefined" ? "" : context
+    return context == null || context === '' || context === 'undefined' ? '' : context
+  },
+  getItemByValue: function (val, dataList) {
+    if (!val || !dataList) {
+      return null
+    }
+    let curItem = null
+    for (let i = 0; i < dataList.length; i++) {
+      if (val == dataList[i].value) {
+        curItem = dataList[i]
+      }
+    }
+    return curItem
   },
   formatDate: {
-
 
     format: function (date, pattern) {
       pattern = pattern || DEFAULT_PATTERN
@@ -54,22 +64,22 @@ export default {
           var sign = matchs1[i]
           switch (sign.charAt(0)) {
             case 'y':
-              _date.setFullYear(_int);
+              _date.setFullYear(_int)
               break
             case 'M':
-              _date.setMonth(_int - 1);
+              _date.setMonth(_int - 1)
               break
             case 'd':
-              _date.setDate(_int);
+              _date.setDate(_int)
               break
             case 'h':
-              _date.setHours(_int);
+              _date.setHours(_int)
               break
             case 'm':
-              _date.setMinutes(_int);
+              _date.setMinutes(_int)
               break
             case 's':
-              _date.setSeconds(_int);
+              _date.setSeconds(_int)
               break
           }
         }
