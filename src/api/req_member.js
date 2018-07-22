@@ -19,4 +19,10 @@ const urlPayCourse = '/atpMember/payCourse.do'
 // 会员销课
 const urlConsumeCourse = '/atpMember/consumeCourse.do'
 
-export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId, urlGetMemberList, urlPayCourse, urlConsumeCourse }
+// 增值列表
+const urlAllMemCourseList = '/atpMember/queryMemCourseList.json'
+// 课耗列表
+const urlAllMemConsumeList = '/atpMember/queryConsumeList.json'
+
+export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId, urlGetMemberList, urlPayCourse, urlConsumeCourse,
+    urlAllMemConsumeList, urlAllMemCourseList }

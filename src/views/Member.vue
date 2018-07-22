@@ -1,70 +1,74 @@
 <template>
 	<section>
-			<!--工具条-->
-			<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-				<el-form :model="searchForm" ref="searchForm" :inline="true">
-					<el-input :model="searchForm.page" type="hidden"  ></el-input>
-					<el-input :model="searchForm.pageSize" type="hidden"></el-input>
-					<el-form-item prop="name">
-						<el-input v-model="searchForm.name"  placeholder="姓名"></el-input>
-					</el-form-item>
-					<el-form-item>
-						<el-button icon="el-icon-search" type="primary" v-on:click="getUsers">查询</el-button>
-					</el-form-item>
-					<el-form-item>
-						<el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
-					</el-form-item>
-				</el-form>
-			</el-col>
-			<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-				<el-form :inline="true">
-					<el-form-item>
-						<el-button type="primary" @click="handleAdd">新增</el-button>
-					</el-form-item>
-				</el-form>
-			</el-col>
+		<!--工具条-->
+		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+			<el-form :model="searchForm" ref="searchForm" :inline="true">
+				<el-input :model="searchForm.page" type="hidden"  ></el-input>
+				<el-input :model="searchForm.pageSize" type="hidden"></el-input>
+				<el-form-item prop="name">
+					<el-input v-model="searchForm.name"  placeholder="姓名"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-button icon="el-icon-search" type="primary" v-on:click="getUsers">查询</el-button>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
+				</el-form-item>
+			</el-form>
+		</el-col>
+		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+			<el-form :inline="true">
+				<el-form-item>
+					<el-button type="primary" @click="handleAdd">新增</el-button>
+				</el-form-item>
+			</el-form>
+		</el-col>
 
-			<!--列表-->
-			<el-table :data="members" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
-				
-				<el-table-column type="index" width="60">
-				</el-table-column>
-				<el-table-column prop="name" label="姓名" width="120">
-					<template slot-scope="scope">
-						<el-popover trigger="hover" placement="top">
-						<p>姓名: {{ scope.row.name }}</p>
-						<p>电话: {{ scope.row.phone }}</p>
-						<p>住址: {{ scope.row.address }}</p>
-						<div slot="reference" class="name-wrapper">
-							<el-tag size="medium">{{ scope.row.name }}</el-tag>
-						</div>
-						</el-popover>
-					</template>
-				</el-table-column>
-				<el-table-column prop="cardNo" label="会员卡号" >
-				</el-table-column>
-				<el-table-column prop="sex" label="性别"   >
-					<template slot-scope="scope">
-						<div>
-							<i  class="atp-web-sex"></i>
-						</div>
-					</template>
-				</el-table-column>
-				<el-table-column prop="age" label="年龄" >
-				</el-table-column>
-				<el-table-column prop="totalBuy" label="累计消费"  >
-				</el-table-column>
-				<el-table-column prop="totalIntegral" label="总积分">
-				</el-table-column>
-				<el-table-column label="操作" >
-					<template scope="scope">
-						<!-- <el-button size="small" @click="reCharge(scope.$index, scope.row)">充值</el-button>
-						<el-button size="small" @click="consume(scope.$index, scope.row)">销课</el-button> -->
-						<el-button size="small" @click="handleDetail(scope.$index, scope.row)">详情</el-button>
-						<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					</template>
-				</el-table-column>
-			</el-table>
+		<!--列表-->
+		<el-table :data="members" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
+			
+			<el-table-column type="index" width="60">
+			</el-table-column>
+			<el-table-column prop="name" label="姓名" width="120">
+				<template slot-scope="scope">
+					<el-popover trigger="hover" placement="top">
+					<p>姓名: {{ scope.row.name }}</p>
+					<p>电话: {{ scope.row.phone }}</p>
+					<p>住址: {{ scope.row.address }}</p>
+					<div slot="reference" class="name-wrapper">
+						<el-tag size="medium">{{ scope.row.name }}</el-tag>
+					</div>
+					</el-popover>
+				</template>
+			</el-table-column>
+			<el-table-column prop="cardNo" label="会员卡号" >
+			</el-table-column>
+			<el-table-column prop="sex" label="性别"   >
+				<template slot-scope="scope">
+					<div>
+						<i  class="atp-web-sex"></i>
+						{{scope.row.sex | parseSex}}
+					</div>
+				</template>
+			</el-table-column>
+			<el-table-column prop="age" label="年龄" >
+			</el-table-column>
+			<el-table-column prop="totalBuy" label="累计消费"  >
+				<template  slot-scope="scope">
+					{{scope.row.totalBuy }}
+				</template>
+			</el-table-column>
+			<el-table-column prop="totalIntegral" label="总积分">
+			</el-table-column>
+			<el-table-column label="操作" >
+				<template scope="scope">
+					<!-- <el-button size="small" @click="reCharge(scope.$index, scope.row)">充值</el-button>
+					<el-button size="small" @click="consume(scope.$index, scope.row)">销课</el-button> -->
+					<el-button size="small" icon="el-icon-more" @click="handleDetail(scope.$index, scope.row)"></el-button>
+					<el-button size="small" icon="el-icon-edit-outline" @click="handleEdit(scope.$index, scope.row)"></el-button>
+				</template>
+			</el-table-column>
+		</el-table>
 		
 
 		<!--工具条-->
@@ -319,6 +323,7 @@ import Recharge from './Recharge'
 export default {
   data() {
 	var validatePass = (rule, value, callback) => {
+		console.log(this.addForm.cardPwd)
 	if (value === '') {
 		callback(new Error('请再次输入密码'));
 	} else if (value !== this.addForm.cardPwd) {
@@ -337,7 +342,7 @@ export default {
 		},
 		total:0,
 		page:1,
-		pageSize:20,
+		pageSize:10,
 		members: [],
 		formTypeObj:{
 			add :'add',
@@ -382,7 +387,7 @@ export default {
 				{required: true, message: '请输入密码', trigger: 'blur'}
 			],
 			repeatPwd:[
-				{required: true,validator: validatePass, message: '请重复密码', trigger: 'blur'}
+				{required: true,validator: validatePass,  trigger: 'blur'}
 			],
 			cardState:[
 				{required: true, message: '请选择卡片状态', trigger: 'blur'}
@@ -521,6 +526,7 @@ export default {
 					this.members = res.data.data.rows;
 					this.total = res.data.data.total;
 					this.page = res.data.data.page;
+					
 			}else{
 					this.members = [];
 					this.total = 0;
@@ -668,7 +674,7 @@ export default {
 		})
 	},
 	addMemCourse:function(){
-		this.selectedCourseList.push({courseList:this.courseList,coachList:[]})
+		this.selectedCourseList.push({courseList:this.courseList,coachList:[],courseAmountArr:'',actualAmount:''})
 	},
 	refreshSelectedCourses:function(selectedCourseList){
 		if(!selectedCourseList){
@@ -678,11 +684,15 @@ export default {
 		this.addForm.coachIdArr=[]
 		this.addForm.totalNumArr=[]
 		this.addForm.courseAmountArr=[]
+		this.addForm.unitPriceArr = []
+		this.addForm.discountAmountArr = []
 		selectedCourseList.forEach(item => {
 			this.addForm.courseIdArr.push(item.courseIdArr)
 			this.addForm.coachIdArr.push(item.coachIdArr)
 			this.addForm.totalNumArr.push(item.totalNumArr)
 			this.addForm.courseAmountArr.push(item.courseAmountArr)	
+			this.addForm.unitPriceArr.push(item.unitPrice) 
+			this.addForm.discountAmountArr.push(item.discountAmount)  
 		});
 	},
 	pageSearch:function(pageination){

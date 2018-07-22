@@ -6,14 +6,16 @@ import routes from './router/routes.js'
 import Api from './api/api.js'
 import ElementUI from 'element-ui'
 import VueRouter from 'vue-router'
+// 货币
+import VueNumeric from 'vue-numeric'
 import store from './vuex/store'
 import Vuex from 'vuex'
-import Pageination from './components/pagination'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/icon/iconfont.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
+Vue.use(VueNumeric)
 
 Vue.config.productionTip = false
 

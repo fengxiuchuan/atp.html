@@ -42,8 +42,10 @@
 					
 				</el-row>
                 <el-row>
-                    <el-button plain>取消</el-button>
-				    <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+                    <el-col :span="4" style="float:right">
+                        <el-button plain>取消</el-button>
+                        <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+                    </el-col>
                 </el-row>
 			</el-form>
 			
@@ -181,6 +183,8 @@ export default {
             // 获取当前的会员
             let curMem = util.getItemByValue(val,this.memberList)
             this.addForm.memCardNo = curMem.cardNo;
+            this.addForm.memName = curMem.name;
+
         },
         addSubmit:function(){
             this.$refs['addForm'].validate((valid) => {

@@ -5,9 +5,10 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage"
+                        
                         :page-sizes="[10, 20, 50, 100]"
                         :page-size="pageination.pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
+                        layout="total, sizes,prev, pager,next"
                         :total="total">
                     </el-pagination>
 			</el-col>
@@ -19,13 +20,17 @@ export default{
     data(){
         return {
             pageination:{
-                pageSize:10,
-                total:0,
-                page:1
+                pageSize:this.pageSize,
+                total:this.total,
+                page:this.currentPage
             }
         }
     },
     props:{
+        pageSize:{
+            type:Number,
+            default:10
+        },
         total:{
             type:Number,
             default:0

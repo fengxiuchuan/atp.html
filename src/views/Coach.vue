@@ -34,7 +34,10 @@
             </el-table-column>
             <el-table-column prop="phone" label="联系方式"  sortable>
             </el-table-column>
-            <el-table-column prop="sex" label="性别" :formatter="parseSex" sortable>
+            <el-table-column prop="sex" label="性别" >
+                <template slot-scope="scope">
+                    {{scope.row.sex | parseSex}}
+                </template>
             </el-table-column>
             <el-table-column prop="age" label="年龄"  sortable>
             </el-table-column>
@@ -370,6 +373,9 @@ export default {
         },
     },
     methods:{
+         parseSex: function(sex) {
+            return sex == 1 ? "男" : sex == 0 ? "女" : "未知";
+        },
         //1 列表
         getCoachList:function(){
             this.searchForm.page = this.page;

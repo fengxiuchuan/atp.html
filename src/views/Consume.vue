@@ -52,7 +52,7 @@
             </el-table-column>
             <el-table-column label="消耗课时">
                 <template slot-scope="scope">
-                    <el-input name="courseNum" v-model="selectedCourseList[scope.$index].courseNum" type="text" placeholder="请输入课时数" @change="usedNumChange(scope.$index, scope.row)">
+                    <el-input name="courseNum" v-model="selectedCourseList[scope.$index].courseNum" type="text" placeholder="请输入课时数" @blur="usedNumChange(scope.$index, scope.row)">
                     </el-input>
                 </template>
             </el-table-column>

@@ -52,7 +52,7 @@
             </el-table-column>
             <el-table-column label="操作" width="200">
                 <template scope="scope">
-                    <el-button size="small" icon="el-icon-edit-outline" @click="handleView(scope.$index, scope.row)"></el-button>
+                    <el-button size="small" icon="el-icon-more" @click="handleView(scope.$index, scope.row)"></el-button>
                     <el-button size="small" icon="el-icon-edit-outline" @click="handleEdit(scope.$index, scope.row)"></el-button>
                 </template>
             </el-table-column>

@@ -47,7 +47,7 @@
             </el-table-column>
             <el-table-column label="优惠价格">
                 <template slot-scope="scope">
-                    <el-input  v-model="selectedCourseList[scope.$index].discountAmount" type="text" placeholder="请输入优惠价格" @change="changePrice(scope.$index, scope.row)">
+                    <el-input   v-model="selectedCourseList[scope.$index].discountAmount" type="text" placeholder="请输入优惠价格" @blur="changePrice(scope.$index, scope.row)">
                     </el-input>
                 </template>
             </el-table-column>
@@ -69,6 +69,7 @@
     </section>
 </template>
 <script>
+import util from '../common/js/util'
 export default {
     data:function(){
         return {
@@ -86,8 +87,10 @@ export default {
             let curCourseList = row.courseList;
             let curCourseId = row.courseIdArr;
             let curCoachList =  this.getCoachListByCourseId(curCourseList,curCourseId);
+            let curCourse = util.getItemByValue(row.courseIdArr,row.courseList);
+            this.selectedCourseList[index].courseName = curCourse.courseName;
             this.selectedCourseList[index].coachList = curCoachList;
-            this.selectedCourseList[index].coachIdArr = null;
+            
         },
         getCoachListByCourseId:function(curCourseList,curCourseId){
             let coachList = []
@@ -100,7 +103,9 @@ export default {
             return coachList;
         },
         coachChange:function(index,row){
-           this.selectedCourseList[index].coachIdArr = row.coachIdArr;
+            let curCoach = util.getItemByValue(row.execCoachId,row.coachList);
+            this.selectedCourseList[index].coachNo = curCoach.coachNo;
+            this.selectedCourseList[index].coachName = curCoach.coachName;
         },
         addRow:function(){
             this.$emit('addMemCourse')
