@@ -1,9 +1,9 @@
 <template>
     <section>
-        <el-row :display="listDisplay" type="flex" class="row-bg" justify="center">
+        
             <!--工具条-->
-            <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-                <el-form :model="searchForm" ref="searchForm" :inline="true">
+            <el-col :span="24" v-show="listDisplay" class="toolbar" style="padding-bottom: 0px;">
+                <el-form :model="searchForm" label-position="right" label-width="120px" ref="searchForm" :inline="true">
                     <el-input :model="searchForm.page" type="hidden"  ></el-input>
                     <el-input :model="searchForm.pageSize" type="hidden"></el-input>
                     <el-form-item label="订单号">
@@ -19,23 +19,19 @@
                         <el-input v-model="searchForm.courseName"  placeholder="课程名称"></el-input>
                     </el-form-item>
                     <el-form-item label="时间选择">
-                            <el-col :span="11">
-                            <el-date-picker type="date" placeholder="开始日期" v-model="searchForm.dateStart" style="width: 100%;"></el-date-picker>
-                        </el-col>
-                        <el-col class="line" :span="2">-</el-col>
-                        <el-col :span="11">
-                            <el-time-picker type="date" placeholder="结束日期" v-model="searchForm.dateEnd" style="width: 100%;"></el-time-picker>
-                        </el-col>
+                        <el-date-picker type="date" placeholder="开始日期" v-model="searchForm.dateStart" style="width:202px"></el-date-picker>
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item label="-">
+                        <el-date-picker type="date" placeholder="结束日期" v-model="searchForm.dateEnd" style="width:202px"></el-date-picker>
+                    </el-form-item>
+                    <el-form-item style="float:right">
                         <el-button icon="el-icon-search" type="primary" v-on:click="queryAllChargeList">查询</el-button>
-                    </el-form-item>
-                    <el-form-item>
+                    
                         <el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
-            <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+            <el-col v-show="listDisplay" :span="24" class="toolbar" style="padding-bottom: 0px;">
                 <el-form :inline="true">
                     <el-form-item>
                         <el-button type="primary" @click="toRecharge">充值</el-button>
@@ -44,37 +40,39 @@
             </el-col>
 
             <!--列表-->
-            <el-table :data="memCourseList" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
-                <template  v-for="item in listColModel">
-                    <el-table-column :key="item.id" v-if="item.type == 'index'" type="index" :prop="item.name" :label="item.label"></el-table-column>
-                    <el-table-column
-                        v-if="item.type == 'normal'"
-                        :key="item.index"
-                        :prop="item.name"
-                        :label="item.label"
-                        :sortable="item.sortable"
-                    >
-                        <template slot-scope="scope">
-                            <span>{{ scope.row.value}}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :key="item.id" v-if="item.type == 'tag'" :prop="item.name" :label="item.label" >
-                        <template slot-scope="scope">
-                            <el-tag type="primary">{{ scope.row.value }}</el-tag>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :key="item.id" v-if="item.type == 'button'" label="操作" >
-                        <template slot-scope="scope">
-                            <el-button size="small" icon="el-icon-more"></el-button>
-                        </template>
-                    </el-table-column>
-                </template>
+            <el-table v-show="listDisplay" :data="memCourseList2" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
+                
+                <el-table-column prop="orderNo" label="订单编号">
+                </el-table-column>
+                <el-table-column prop="cardNo" label="会员卡号" >
+                </el-table-column>
+                <el-table-column prop="memName" label="姓名">
+                </el-table-column>
+                <el-table-column prop="courseName" label="课程名称" >
+                </el-table-column>
+                <el-table-column prop="coachName" label="教练" >
+                </el-table-column>
+
+                <el-table-column prop="unitPrice" label="课时单价" >
+                </el-table-column>
+                <el-table-column prop="totalNum" label="总课时" >
+                </el-table-column>
+                <el-table-column prop="freeNum" label="剩余课时" >
+                </el-table-column>
+                <el-table-column prop="usedNum" label="已耗课时" >
+                </el-table-column>
+                <el-table-column prop="actualAmount" label="实际价格" >
+                </el-table-column>
+                <el-table-column prop="discountAmount" label="优惠" >
+                </el-table-column>
+                <el-table-column prop="courseAmount" label="总价" >
+                </el-table-column>
             </el-table>
             <!--工具条-->
-            <pagination @search="pageSearch" :total="total" :currentPage = "page"></pagination>
-        </el-row>
+            <pagination v-show="listDisplay" @search="pageSearch" :total="total" :currentPage = "page"></pagination>
+        
         <!--充值-->
-        <el-form :model="addForm" label-width="100px" :rules="addFormRules" :display="addFormDisplay" ref="addForm" >
+        <el-form v-show="addFormDisplay" :model="addForm" label-width="100px" :rules="addFormRules" style="display:none" :display="addFormDisplay" ref="addForm" >
             <el-form-item label="卡号" prop="memId">
                 <el-col :span="24">
                 <el-select v-model="addForm.memId" 
@@ -110,7 +108,7 @@
             </el-form-item>		
 			<el-form-item>
                 <el-col :span="24">
-                    <el-button plain>取消</el-button>
+                    <el-button plain  @click.native="cancelSubmit">取消</el-button>
                     <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>	
                 </el-col>
 			</el-form-item>
@@ -142,96 +140,10 @@ export default {
                 ]
             },
             addForm:{},
-            addFormDisplay:'none',
-            listDisplay:'block',
-            listColModel:[
-                {
-                    type:'normal',
-                    label:'销课单号',
-                    name:'consumeNo',
-                    index:'consumeNo',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'卡号',
-                    name:'memCardNo',
-                    index:'memCardNo',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'姓名',
-                    name:'memName',
-                    index:'memName',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'课程名称',
-                    name:'courseName',
-                    index:'courseName',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'课程教练',
-                    name:'coachName',
-                    index:'coachName',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'课时单价',
-                    name:'unitPrice',
-                    index:'unitPrice',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'总课时',
-                    name:'totalNum',
-                    index:'totalNum',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'剩余课时',
-                    name:'freeNum',
-                    index:'freeNum',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'已耗课时',
-                    name:'usedNum',
-                    index:'usedNum',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'实际价格',
-                    name:'actualAmount',
-                    index:'actualAmount',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'优惠',
-                    name:'discountAmount',
-                    index:'discountAmount',
-                    sortable:true
-                },
-                {
-                    type:'normal',
-                    label:'总价',
-                    name:'courseAmount',
-                    index:'courseAmount',
-                    sortable:true
-                }
-
-            ],
-            memCourseList:[],
+            addFormDisplay:false,
+            listDisplay:true,
+           
+            memCourseList2:[],
             searchForm: {
                 orderNo:'',
                 memName:'',
@@ -338,12 +250,12 @@ export default {
             // 请求后台
             this.$http.post(urlAllMemCourseList, para, res => {
                 if(res.data.code =='A_SYS_00010'){
-                        this.memCourseList = res.data.data;
+                        this.memCourseList2 = res.data.data.rows;
                         this.total = res.data.data.total;
                         this.page = res.data.data.page;
                         
                 }else{
-                        this.memCourseList = []
+                        this.memCourseList2 = []
                         this.total = 0;
                         this.page = 1;
                 }
@@ -351,9 +263,15 @@ export default {
                 this.listLoading = false;
             });
         },
+        cancelSubmit:function(){
+            this.$refs['addForm'].resetFields();
+            this.listDisplay = true;
+            this.addFormDisplay = false;
+            this.queryAllChargeList();
+        },
         toRecharge:function(){
-            this.listDisplay = 'none';
-            this.addFormDisplay = 'block';
+            this.listDisplay = false;
+            this.addFormDisplay = true;
         },
         addSubmit:function(){
             this.$refs['addForm'].validate((valid) => {
