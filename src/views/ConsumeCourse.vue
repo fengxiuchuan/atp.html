@@ -1,6 +1,68 @@
 <template>
     <section>
-        <el-form :model="addForm" label-width="100px" :rules="addFormRules" ref="addForm" >
+        <!--工具条-->
+        <el-col :span="24" v-show="listDisplay" class="toolbar" style="padding-bottom: 0px;">
+            <el-form :model="searchForm" label-position="right" label-width="120px" ref="searchForm" :inline="true">
+                <el-input :model="searchForm.page" type="hidden"  ></el-input>
+                <el-input :model="searchForm.pageSize" type="hidden"></el-input>
+                <el-form-item label="消费订单号">
+                    <el-input v-model="searchForm.consumeNo"  placeholder="订单号"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名">
+                    <el-input v-model="searchForm.memName"  placeholder="姓名"></el-input>
+                </el-form-item>
+                <el-form-item label="会员卡号">
+                    <el-input v-model="searchForm.memCardNo"  placeholder="卡号"></el-input>
+                </el-form-item>
+                <el-form-item label="课程名称">
+                    <el-input v-model="searchForm.courseName"  placeholder="课程名称"></el-input>
+                </el-form-item>
+                <el-form-item label="时间选择">
+                    <el-date-picker type="date" placeholder="开始日期" v-model="searchForm.dateStart" style="width:202px"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="-">
+                    <el-date-picker type="date" placeholder="结束日期" v-model="searchForm.dateEnd" style="width:202px"></el-date-picker>
+                </el-form-item>
+                <el-form-item style="float:right">
+                    <el-button icon="el-icon-search" type="primary" v-on:click="queryAllChargeList">查询</el-button>
+                
+                    <el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+        <el-col v-show="listDisplay" :span="24" class="toolbar" style="padding-bottom: 0px;">
+            <el-form :inline="true">
+                <el-form-item>
+                    <el-button type="primary" @click="toConsume">充值</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+
+        <!--列表-->
+        <el-table v-show="listDisplay" :data="memConsumeList" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
+            <el-table-column prop="consumeNo" label="消费订单编号">
+            </el-table-column>
+            <el-table-column prop="memCardNo" label="会员卡号" >
+            </el-table-column>
+            <el-table-column prop="memName" label="姓名">
+            </el-table-column>
+            <el-table-column prop="courseName" label="课程名称" >
+            </el-table-column>
+            <el-table-column prop="coachName" label="教练" >
+            </el-table-column>
+            <el-table-column prop="execCoachName" label="执行教练" >
+            </el-table-column>
+            <el-table-column prop="courseNum" label="消耗课时" >
+            </el-table-column>
+            <el-table-column prop="integral" label="积分" >
+            </el-table-column>
+            <el-table-column prop="consumeTime" label="消耗时间">
+            </el-table-column>
+        </el-table>
+        <!--工具条-->
+        <pagination v-show="listDisplay" @search="pageSearch" :total="total" :currentPage = "page"></pagination>
+
+        <el-form v-show="addFormDisplay" :model="addForm" label-width="100px" :rules="addFormRules" ref="addForm" >
 			    <el-row>
 					<el-col :span="24">
 						<el-form-item label="卡号" prop="memId">
@@ -53,7 +115,7 @@
 </template>
 <script>
 import 
-{ urlGetMemberList,urlConsumeCourse,urlGetCourseListByMemId} from "../api/req_member";
+{ urlGetMemberList,urlConsumeCourse,urlGetCourseListByMemId,urlAllMemConsumeList} from "../api/req_member";
 import {urlGetGymCourseList} from '../api/req_course'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
@@ -67,6 +129,7 @@ export default {
             courseList:[],
             loading:false,
             addLoading:false,
+            listLoading:false,
             addFormRules:{
                 memId:[
                     { required: true, message: '请选择需要销课的会员', trigger: 'blur' },
@@ -74,7 +137,24 @@ export default {
             },
             addForm:{
                
-            }
+            },
+            addForm:{},
+            addFormDisplay:false,
+            listDisplay:true,
+            memConsumeList:[],
+            searchForm: {
+                consumeNo:'',
+                memCardNo:'',
+                memName:'',
+                courseName:'',
+                page:1,
+                pageSize:10,
+                dateStart:'',
+                dateEnd:''
+            },
+            total:0,
+            page:1,
+            pageSize:10,
         }
     },
     methods:{
@@ -185,6 +265,47 @@ export default {
             this.addForm.memCardNo = curMem.cardNo;
             this.addForm.memName = curMem.name;
 
+        },
+        pageSearch:function(pageination){
+			this.page = pageination.page;
+			this.pageSize = pageination.pageSize;
+			this.total = pageination.total;
+			this.queryAllConsumeList()
+	    },
+        resetSearchFrom:function(formName){
+            this.$refs['searchForm'].resetFields();
+        },
+        //获取用户列表
+        queryAllConsumeList: function() {
+            this.searchForm.page = this.page;
+            this.searchForm.pageSize = this.pageSize;
+            let para = Object.assign({}, this.searchForm);
+            this.listLoading = true;
+            // 请求后台
+            this.$http.post(urlAllMemConsumeList, para, res => {
+                if(res.data.code =='A_SYS_00010'){
+                        this.memConsumeList = res.data.data.rows;
+                        this.total = res.data.data.total;
+                        this.page = res.data.data.page;
+                        
+                }else{
+                        this.memConsumeList = []
+                        this.total = 0;
+                        this.page = 1;
+                }
+                
+                this.listLoading = false;
+            });
+        },
+        cancelSubmit:function(){
+            this.$refs['addForm'].resetFields();
+            this.listDisplay = true;
+            this.addFormDisplay = false;
+            this.queryAllChargeList();
+        },
+        toConsume:function(){
+            this.listDisplay = false;
+            this.addFormDisplay = true;
         },
         addSubmit:function(){
             this.$refs['addForm'].validate((valid) => {

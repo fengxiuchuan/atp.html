@@ -711,12 +711,37 @@ export default {
 
 		});
 	},
-	
+	addTesJson:function(){
+		let jsonStr = 'baba我f"fdsfds""是测试';
+		let tempJson = "";
+	    let jsonArr = jsonStr.split("\"");
+		for(var i = 0; i < jsonArr.length; i++){
+			tempJson += jsonArr[i];
+			if(i != jsonArr.length-1){
+				if(i % 2 ==0 ){
+					tempJson += "“";
+				}else{
+					tempJson += "”";
+				}
+				
+			}
+		}
+		alert(tempJson)
+		let para = {json:tempJson}
+		this.$http.post('/atpMember/testJson.do', para, res => {
+			if(res && res.data && 'A_SYS_00010' === res.data.code){
+				this.courseList = res.data.data;
+			}else{
+				this.courseList = [];
+			}
+
+		});
+	}
   },
   mounted() {
 	this.getUsers();
 	this.initCourseList();
-	
+	this.addTesJson();
   },
   components:{
 		'pagination':Pageination,
