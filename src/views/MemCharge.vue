@@ -1,76 +1,75 @@
 <template>
     <section>
         
-            <!--工具条-->
-            <el-col :span="24" v-show="listDisplay" class="toolbar" style="padding-bottom: 0px;">
-                <el-form :model="searchForm" label-position="right" label-width="120px" ref="searchForm" :inline="true">
-                    <el-input :model="searchForm.page" type="hidden"  ></el-input>
-                    <el-input :model="searchForm.pageSize" type="hidden"></el-input>
-                    <el-form-item label="订单号">
-                        <el-input v-model="searchForm.orderNo"  placeholder="订单号"></el-input>
-                    </el-form-item>
-                    <el-form-item label="姓名">
-                        <el-input v-model="searchForm.memName"  placeholder="姓名"></el-input>
-                    </el-form-item>
-                    <el-form-item label="会员卡号">
-                        <el-input v-model="searchForm.cardNo"  placeholder="卡号"></el-input>
-                    </el-form-item>
-                    <el-form-item label="课程名称">
-                        <el-input v-model="searchForm.courseName"  placeholder="课程名称"></el-input>
-                    </el-form-item>
-                    <el-form-item label="时间选择">
-                        <el-date-picker type="date" placeholder="开始日期" v-model="searchForm.dateStart" style="width:202px"></el-date-picker>
-                    </el-form-item>
-                    <el-form-item label="-">
-                        <el-date-picker type="date" placeholder="结束日期" v-model="searchForm.dateEnd" style="width:202px"></el-date-picker>
-                    </el-form-item>
-                    <el-form-item style="float:right">
-                        <el-button icon="el-icon-search" type="primary" v-on:click="queryAllChargeList">查询</el-button>
-                    
-                        <el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-            <el-col v-show="listDisplay" :span="24" class="toolbar" style="padding-bottom: 0px;">
-                <el-form :inline="true">
-                    <el-form-item>
-                        <el-button type="primary" @click="toRecharge">充值</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-
-            <!--列表-->
-            <el-table v-show="listDisplay" :data="memCourseList2" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
+        <!--工具条-->
+        <el-col :span="24" v-show="listDisplay" class="toolbar" style="padding-bottom: 0px;">
+            <el-form :model="searchForm" label-position="right" label-width="120px" ref="searchForm" :inline="true">
+                <el-input :model="searchForm.page" type="hidden"  ></el-input>
+                <el-input :model="searchForm.pageSize" type="hidden"></el-input>
+                <el-form-item label="订单号">
+                    <el-input v-model="searchForm.orderNo"  placeholder="订单号"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名">
+                    <el-input v-model="searchForm.memName"  placeholder="姓名"></el-input>
+                </el-form-item>
+                <el-form-item label="会员卡号">
+                    <el-input v-model="searchForm.cardNo"  placeholder="卡号"></el-input>
+                </el-form-item>
+                <el-form-item label="课程名称">
+                    <el-input v-model="searchForm.courseName"  placeholder="课程名称"></el-input>
+                </el-form-item>
+                <el-form-item label="时间选择">
+                    <el-date-picker type="date" placeholder="开始日期" v-model="searchForm.dateStart" style="width:202px"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="-">
+                    <el-date-picker type="date" placeholder="结束日期" v-model="searchForm.dateEnd" style="width:202px"></el-date-picker>
+                </el-form-item>
+                <el-form-item style="float:right">
+                    <el-button icon="el-icon-search" type="primary" v-on:click="queryAllChargeList">查询</el-button>
                 
-                <el-table-column prop="orderNo" label="订单编号">
-                </el-table-column>
-                <el-table-column prop="cardNo" label="会员卡号" >
-                </el-table-column>
-                <el-table-column prop="memName" label="姓名">
-                </el-table-column>
-                <el-table-column prop="courseName" label="课程名称" >
-                </el-table-column>
-                <el-table-column prop="coachName" label="教练" >
-                </el-table-column>
+                    <el-button type="primary" @click="resetSearchFrom('searchForm')">重置</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
+        <el-col v-show="listDisplay" :span="24" class="toolbar" style="padding-bottom: 0px;">
+            <el-form :inline="true">
+                <el-form-item>
+                    <el-button type="primary" @click="toRecharge">充值</el-button>
+                </el-form-item>
+            </el-form>
+        </el-col>
 
-                <el-table-column prop="unitPrice" label="课时单价" >
-                </el-table-column>
-                <el-table-column prop="totalNum" label="总课时" >
-                </el-table-column>
-                <el-table-column prop="freeNum" label="剩余课时" >
-                </el-table-column>
-                <el-table-column prop="usedNum" label="已耗课时" >
-                </el-table-column>
-                <el-table-column prop="actualAmount" label="实际价格" >
-                </el-table-column>
-                <el-table-column prop="discountAmount" label="优惠" >
-                </el-table-column>
-                <el-table-column prop="courseAmount" label="总价" >
-                </el-table-column>
-            </el-table>
-            <!--工具条-->
-            <pagination v-show="listDisplay" @search="pageSearch" :total="total" :currentPage = "page"></pagination>
-        
+        <!--列表-->
+        <el-table v-show="listDisplay" :data="memCourseList2" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
+            
+            <el-table-column prop="orderNo" label="订单编号">
+            </el-table-column>
+            <el-table-column prop="cardNo" label="会员卡号" >
+            </el-table-column>
+            <el-table-column prop="memName" label="姓名">
+            </el-table-column>
+            <el-table-column prop="courseName" label="课程名称" >
+            </el-table-column>
+            <el-table-column prop="coachName" label="教练" >
+            </el-table-column>
+
+            <el-table-column prop="unitPrice" label="课时单价" >
+            </el-table-column>
+            <el-table-column prop="totalNum" label="总课时" >
+            </el-table-column>
+            <el-table-column prop="freeNum" label="剩余课时" >
+            </el-table-column>
+            <el-table-column prop="usedNum" label="已耗课时" >
+            </el-table-column>
+            <el-table-column prop="actualAmount" label="实际价格" >
+            </el-table-column>
+            <el-table-column prop="discountAmount" label="优惠" >
+            </el-table-column>
+            <el-table-column prop="courseAmount" label="总价" >
+            </el-table-column>
+        </el-table>
+        <!--工具条-->
+        <pagination v-show="listDisplay" @search="pageSearch" :total="total" :currentPage = "page"></pagination>
         <!--充值-->
         <el-form v-show="addFormDisplay" :model="addForm" label-width="100px" :rules="addFormRules" style="display:none" :display="addFormDisplay" ref="addForm" >
             <el-form-item label="卡号" prop="memId">

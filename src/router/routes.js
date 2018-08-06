@@ -9,6 +9,7 @@ import Course from '../views/Course.vue'
 import MemCharge from '../views/MemCharge.vue'
 import Consume from '../views/ConsumeCourse.vue'
 import ChargeSuc from '../views/ChargeSuc.vue'
+import SysMenum from '../views/menu.vue'
 let routes = [
   {
     path: '/login',
@@ -62,7 +63,8 @@ let routes = [
       { path: '/Gym', component: Gym, name: '场馆' },
       { path: '/Course', component: Course, name: '开设课程' },
       { path: '/MemCharge', component: MemCharge, name: '增值服务' },
-      { path: '/Consume', component: Consume, name: '消费积分' }
+      { path: '/Consume', component: Consume, name: '消费积分' },
+      { path: '/SysMenum', component: SysMenum, name: '菜单' }
     ]
   },
   // {
