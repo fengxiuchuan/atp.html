@@ -20,11 +20,9 @@
                 <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.path" placeholder="path"></el-input></span>
                 <span><el-input type="text" style="width:100px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.iconCls" placeholder="iconCls"></el-input></span>
                 <span style="width:80px" >
-                  
+                    <label>是否授权</label>
                     <el-switch
                       v-model="data.requireAuth"
-                       active-text="授权"
-                       inactive-text="开放"
                       active-color="#13ce66"
                       inactive-color="#ff4949"
                       active-value=""
@@ -32,10 +30,9 @@
                     </el-switch>
                 </span>
                 <span style="width:30px" >
+                    <label>是否有效</label>
                     <el-switch
                       v-model="data.enabled"
-                      active-text="有效"
-                      inactive-text="无效"
                       active-color="#13ce66"
                       inactive-color="#ff4949"
                       active-value=""
@@ -52,11 +49,17 @@
                     </el-select>
                   </span>
                   <span style="width:30px" >
+                   <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => append(data,'')">
+                      新增同级
+                    </el-button>
                     <el-button
                       type="text"
                       size="mini"
-                      @click="() => append(data)">
-                      新增
+                      @click="() => append(data,'children')">
+                      新增下级
                     </el-button>
                     <el-button
                       type="text"
@@ -69,7 +72,7 @@
                       type="text"
                       size="mini"
                       @click="() => saveNode(data)">
-                      保存
+                      保存更新
                     </el-button>
                   </span>
                 </span>
@@ -81,6 +84,7 @@
 </template>
 <script>
 import TreeRender from '../components/Tree_render'
+import {urlAddMenu,urlEditMenu,urlDelMenu,urlQueryMenuTree} from "../api/req_menu";
 export default {
     watch: {
       filterText(val) {
@@ -99,6 +103,7 @@ export default {
             requireAuth:true,
             enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
             parentId: '',
+            inEdit:false,
             children: [{
               id: 4,
               name:"二级-1级",
@@ -109,6 +114,8 @@ export default {
               requireAuth:true,
               enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '1',
+              inEdit:false,
+              children:[]
             },{
               id: 5,
               name:"二级 2-2级",
@@ -119,6 +126,8 @@ export default {
               requireAuth:true,
               enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '1',
+              inEdit:false,
+              children:[]
             }, {
               id: 6,
               name:"二级-1级",
@@ -129,6 +138,8 @@ export default {
               requireAuth:true,
               enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '1',
+              inEdit:false,
+              children:[]
             },]
           }];
 
@@ -142,6 +153,7 @@ export default {
               requireAuth:true,
               enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
+              inEdit:true
         }
       return {
         filterText: '',
@@ -167,23 +179,83 @@ export default {
       handleNodeClick(data) {
         console.log(data);
       },
-      append(data) {
-        const newChild = nodeObj;
-        newChild.parentId = data.id;
-        if (!data.children) {
-          this.$set(data, 'children', []);
+      append(data,type) {
+         const newNode = nodeObj;
+        if(type == 'children'){
+          newNode.parentId = data.id;
+          if (!data.children) {
+            this.$set(data, 'children', []);
+          }
+          data.children.push(newNode);
+        }else{
+          newNode.id = data.id;
+          newNode.parentId = data.parentId;
+          data.push(newNode);
         }
-        data.children.push(newChild);
+       
+        
       },
 
       remove(node, data) {
         const parent = node.parent;
+        const curId = data.id;
+        if(!curId){
+          this.$refs[this.formNameObj.addForm].validate((valid) => {
+          if(valid){
+              this.$confirm(confirmTxt,'确认删除本级和所属资源么？',{
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'info '
+              }).then(() => {
+                
+                let para = {id:data.id}
+                this.$http.delete(urlDelMenu, para, res => {
+                  this.addLoading = false;
+                  if(res && res.data && 'A_SYS_00010' === res.data.code){
+                      this.$message({
+                        message: res.data.msg,
+                        type: 'success'
+                      });
+                      const children = parent.data.children || parent.data;
+                      const index = children.findIndex(d => d.id === data.id);
+                      children.splice(index, 1);
+                   }else{
+                    this.$message({
+                      message: res.data.msg,
+                      type: 'warning'
+                    });
+                  }
+
+                });
+              })
+          }
+			})
+      }else{
         const children = parent.data.children || parent.data;
         const index = children.findIndex(d => d.id === data.id);
         children.splice(index, 1);
+      }
+        
       },
       saveNode(data){
+          let para = Object.assign({},data);
+          this.$http.post(urlDelMenu, para, res => {
+            this.addLoading = false;
+            if(res && res.data && 'A_SYS_00010' === res.data.code){
+                this.$message({
+                  message: res.data.msg,
+                  type: 'success'
+                });
+                data.id = res.data.data.id;
+                data.inEdit = false;
+              }else{
+              this.$message({
+                message: res.data.msg,
+                type: 'warning'
+              });
+            }
 
+          });
       }
     },
     components:{
