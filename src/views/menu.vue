@@ -52,13 +52,13 @@
                    <el-button
                       type="text"
                       size="mini"
-                      @click="() => append(data,'')">
+                      @click="() => append(data,node,'')">
                       新增同级
                     </el-button>
                     <el-button
                       type="text"
                       size="mini"
-                      @click="() => append(data,'children')">
+                      @click="() => append(data,node,'children')">
                       新增下级
                     </el-button>
                     <el-button
@@ -85,6 +85,7 @@
 <script>
 import TreeRender from '../components/Tree_render'
 import {urlAddMenu,urlEditMenu,urlDelMenu,urlQueryMenuTree} from "../api/req_menu";
+let serial = 10000
 export default {
     watch: {
       filterText(val) {
@@ -143,7 +144,29 @@ export default {
             },]
           }];
 
-        const nodeObj = {
+        
+      return {
+        filterText: '',
+        data2:[],
+        menuTypeArr:[
+          {label:"菜单",value:"menu"},
+          {label:"按钮",value:"btn"}
+        ],
+        initRoot:[
+          {
+              id:"",
+              name:"",
+              url:"",
+              path:"",
+              iconCls:"",
+              requireAuth:"",
+              requireAuth:true,
+              enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              parentId: -1,
+              inEdit:true
+        }
+        ],
+        nodeObj:{
               id:"",
               name:"",
               url:"",
@@ -154,14 +177,7 @@ export default {
               enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
               inEdit:true
-        }
-      return {
-        filterText: '',
-        data2:JSON.parse(JSON.stringify(data2)),
-        menuTypeArr:[
-          {label:"菜单",value:"menu"},
-          {label:"按钮",value:"btn"}
-        ],
+        },
         defaultProps: {
           children: 'children',
           label: 'label'
@@ -179,8 +195,10 @@ export default {
       handleNodeClick(data) {
         console.log(data);
       },
-      append(data,type) {
-         const newNode = nodeObj;
+      append(data,node,type) {
+          let parentId = data.parentId;
+        
+         const newNode = this.nodeObj;
         if(type == 'children'){
           newNode.parentId = data.id;
           if (!data.children) {
@@ -188,9 +206,14 @@ export default {
           }
           data.children.push(newNode);
         }else{
-          newNode.id = data.id;
+          serial = serial + 1
+          newNode.id = serial;
           newNode.parentId = data.parentId;
-          data.push(newNode);
+          if(parentId == '' || parentId == -1){
+            this.data2.push(newNode);
+          }else{
+            node.parent.childNodes.push(newNode)
+          }
         }
        
         
@@ -199,6 +222,15 @@ export default {
       remove(node, data) {
         const parent = node.parent;
         const curId = data.id;
+        const children  = data.children;
+        if(children && children.length > 0){
+             this.$message({
+                message:"该节点存在下级资源，不能删除！",
+                type: 'warning'
+              });
+          return;
+        }
+
         if(!curId){
           this.$refs[this.formNameObj.addForm].validate((valid) => {
           if(valid){
@@ -229,15 +261,28 @@ export default {
                 });
               })
           }
-			})
-      }else{
-        const children = parent.data.children || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
-      }
+        })
+        }else{
+          const children = parent.data.children || parent.data;
+          const index = children.findIndex(d => d.id === data.id);
+          children.splice(index, 1);
+        }
         
       },
+      getMenuTree:function(){
+         this.$http.post(urlQueryMenuTree, {}, res => {
+            this.addLoading = false;
+            if(res && res.data && 'A_SYS_00010' === res.data.code && res.data.data.length > 0){
+                this.data2 = res.data.data;
+              }else{
+                this.data2 = this.initRoot;
+            }
+        });
+      },
       saveNode(data){
+          if(data.id > 10000){
+            data.id = ''
+          }
           let para = Object.assign({},data);
           this.$http.post(urlDelMenu, para, res => {
             this.addLoading = false;
@@ -257,6 +302,9 @@ export default {
 
           });
       }
+    },
+    mounted(){
+      this.getMenuTree();
     },
     components:{
       "TreeRender":TreeRender
