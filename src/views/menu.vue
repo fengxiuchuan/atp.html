@@ -16,30 +16,23 @@
                 :expand-on-click-node="false">
                 <span class="custom-tree-node" style="margin:5px;height:20px;" slot-scope="{ node, data }">
                 <span><el-input type="text" style="width:100px;heght:18px" size="small" :readonly="data.readOnly" v-model="data.name"  placeholder="请输入名称"></el-input></span>
-                <span><el-input type="text" style="width:200px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.url" placeholder="url"></el-input></span>
+                <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.url" placeholder="url"></el-input></span>
                 <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.path" placeholder="path"></el-input></span>
+                <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.component" placeholder="component"></el-input></span>
                 <span><el-input type="text" style="width:100px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.iconCls" placeholder="iconCls"></el-input></span>
-                <span style="width:80px" >
-                    <label>是否授权</label>
-                    <el-switch
-                      v-model="data.requireAuth"
-                      active-color="#13ce66"
-                      inactive-color="#ff4949"
-                      active-value=""
-                      inactive-value="0">
-                    </el-switch>
-                </span>
                 <span style="width:30px" >
-                    <label>是否有效</label>
+                  
+                    <label>状态</label>
                     <el-switch
-                      v-model="data.enabled"
+                      v-model="data.state"
                       active-color="#13ce66"
                       inactive-color="#ff4949"
-                      active-value=""
-                      inactive-value="0">
-                    </el-switch></span>
-                  <span style="width:30px" >
-                    <el-select   size="small"  v-model="data.menuType"  placeholder="请选择" >
+                      active-value="true"
+                      inactive-value="false">
+                    </el-switch>
+                    </span>
+                  <span  >
+                    <el-select style="width:100px"  size="small"  v-model="data.menuType"  placeholder="请选择" >
                         <el-option
                         v-for="item in menuTypeArr"
                         :key="item.value"
@@ -49,7 +42,27 @@
                     </el-select>
                   </span>
                   <span style="width:30px" >
-                   <el-button
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => remove(node, data)">
+                      删除
+                    </el-button>
+                    <el-button
+                      v-if="!data.inEdit"
+                      type="text"
+                      size="mini"
+                      @click="() => handlEdit(data)">
+                      编辑
+                    </el-button>
+                    <el-button
+                      v-if="data.inEdit"
+                      type="text"
+                      size="mini"
+                      @click="() => saveNode(data)">
+                      保存更新
+                    </el-button>
+                    <el-button
                       type="text"
                       size="mini"
                       @click="() => append(data,node,'')">
@@ -60,19 +73,6 @@
                       size="mini"
                       @click="() => append(data,node,'children')">
                       新增下级
-                    </el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => remove(node, data)">
-                      删除
-                    </el-button>
-                    <el-button
-                      v-if="data.id == -1"
-                      type="text"
-                      size="mini"
-                      @click="() => saveNode(data)">
-                      保存更新
                     </el-button>
                   </span>
                 </span>
@@ -93,77 +93,29 @@ export default {
       }
     },
     data:function() {
-      const data2 =   [
-        {
-            id: 1,
-            name:"一级",
-            url:"/user/cc",
-            path:"user",
-            iconCls:"icon-user",
-            requireAuth:"",
-            requireAuth:true,
-            enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
-            parentId: '',
-            inEdit:false,
-            children: [{
-              id: 4,
-              name:"二级-1级",
-              url:"/user/cc",
-              path:"user",
-              iconCls:"icon-user",
-              requireAuth:"",
-              requireAuth:true,
-              enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
-              parentId: '1',
-              inEdit:false,
-              children:[]
-            },{
-              id: 5,
-              name:"二级 2-2级",
-              url:"/user/cc",
-              path:"user",
-              iconCls:"icon-user",
-              requireAuth:"",
-              requireAuth:true,
-              enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
-              parentId: '1',
-              inEdit:false,
-              children:[]
-            }, {
-              id: 6,
-              name:"二级-1级",
-              url:"/user/cc",
-              path:"user",
-              iconCls:"icon-user",
-              requireAuth:"",
-              requireAuth:true,
-              enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
-              parentId: '1',
-              inEdit:false,
-              children:[]
-            },]
-          }];
-
-        
       return {
         filterText: '',
         data2:[],
         menuTypeArr:[
+          {label:"模块",value:"module"},
           {label:"菜单",value:"menu"},
           {label:"按钮",value:"btn"}
         ],
         initRoot:[
           {
-              id:"",
+              id:0,
               name:"",
               url:"",
               path:"",
               iconCls:"",
               requireAuth:"",
               requireAuth:true,
-              enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: -1,
-              inEdit:true
+              inEdit:true,
+              level:1,
+              component:'',
+              children:[]
         }
         ],
         nodeObj:{
@@ -174,9 +126,11 @@ export default {
               iconCls:"",
               requireAuth:"",
               requireAuth:true,
-              enabled:"",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
-              inEdit:true
+              inEdit:true,
+              component:'',
+              children:[]
         },
         defaultProps: {
           children: 'children',
@@ -195,24 +149,51 @@ export default {
       handleNodeClick(data) {
         console.log(data);
       },
+      handlEdit(data){
+        data.inEdit = true;
+      },
       append(data,node,type) {
-          let parentId = data.parentId;
-        
-         const newNode = this.nodeObj;
+         let parentId = data.parentId;
+         if(data.id >= 10000 || data.id == 0 || data.id == -1){
+             this.$message({
+                message:"请先保存当前菜单",
+                type: 'warning'
+              });
+            return;
+         }
+         let level = data.level;
+         const newNode = {
+              id:"",
+              name:"",
+              url:"",
+              path:"",
+              iconCls:"",
+              requireAuth:"",
+              requireAuth:true,
+              state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              parentId: '',
+              inEdit:true,
+              level:-1,
+              component:'',
+              children:[]
+        };
+        serial = serial + 1
+        newNode.id = serial;
         if(type == 'children'){
           newNode.parentId = data.id;
+          newNode.level = (data.level ? data.level : 1) + 1
           if (!data.children) {
             this.$set(data, 'children', []);
           }
           data.children.push(newNode);
         }else{
-          serial = serial + 1
-          newNode.id = serial;
+         
           newNode.parentId = data.parentId;
-          if(parentId == '' || parentId == -1){
+          newNode.level = data.level;
+          if(level == 1){
             this.data2.push(newNode);
           }else{
-            node.parent.childNodes.push(newNode)
+            node.parent.data.children.push(newNode)
           }
         }
        
@@ -222,6 +203,7 @@ export default {
       remove(node, data) {
         const parent = node.parent;
         const curId = data.id;
+        const parentId = data.parentId;
         const children  = data.children;
         if(children && children.length > 0){
              this.$message({
@@ -231,10 +213,9 @@ export default {
           return;
         }
 
-        if(!curId){
-          this.$refs[this.formNameObj.addForm].validate((valid) => {
-          if(valid){
-              this.$confirm(confirmTxt,'确认删除本级和所属资源么？',{
+        if(curId && curId < 10000){
+         
+              this.$confirm('确认删除本级和所属资源么？',{
               confirmButtonText: '确定',
               cancelButtonText: '取消',
               type: 'info '
@@ -260,12 +241,13 @@ export default {
 
                 });
               })
-          }
-        })
+        
         }else{
-          const children = parent.data.children || parent.data;
-          const index = children.findIndex(d => d.id === data.id);
-          children.splice(index, 1);
+          
+            const children = parent.data.children || parent.data;
+            const index = children.findIndex(d => d.id === data.id);
+            children.splice(index, 1);
+          
         }
         
       },
@@ -283,21 +265,26 @@ export default {
           if(data.id > 10000){
             data.id = ''
           }
+          let submitUrl = urlAddMenu;
+          if(!data.inEdit){
+            submitUrl = urlEditMenu;
+          }
           let para = Object.assign({},data);
-          this.$http.post(urlDelMenu, para, res => {
+          this.$http.post(submitUrl, para, res => {
             this.addLoading = false;
             if(res && res.data && 'A_SYS_00010' === res.data.code){
                 this.$message({
                   message: res.data.msg,
                   type: 'success'
                 });
+                
                 data.id = res.data.data.id;
                 data.inEdit = false;
               }else{
-              this.$message({
-                message: res.data.msg,
-                type: 'warning'
-              });
+                this.$message({
+                  message: res.data.msg,
+                  type: 'warning'
+                });
             }
 
           });

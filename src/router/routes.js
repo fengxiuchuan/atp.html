@@ -9,7 +9,9 @@ import Course from '../views/Course.vue'
 import MemCharge from '../views/MemCharge.vue'
 import Consume from '../views/ConsumeCourse.vue'
 import ChargeSuc from '../views/ChargeSuc.vue'
-import SysMenum from '../views/menu.vue'
+import SysMenu from '../views/menu.vue'
+import SysRole from '../views/role.vue'
+import SysUser from '../views/user.vue'
 let routes = [
   {
     path: '/login',
@@ -64,7 +66,9 @@ let routes = [
       { path: '/Course', component: Course, name: '开设课程' },
       { path: '/MemCharge', component: MemCharge, name: '增值服务' },
       { path: '/Consume', component: Consume, name: '消费积分' },
-      { path: '/SysMenum', component: SysMenum, name: '菜单' }
+      { path: '/SysMenum', component: SysMenu, name: '菜单' },
+      { path: '/SysUser', component: SysUser, name: '用户管理' },
+      { path: '/SysRole', component: SysRole, name: '角色管理' }
     ]
   },
   // {

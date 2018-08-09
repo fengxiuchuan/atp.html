@@ -131,6 +131,15 @@ export default {
                 page:1,
                 pageSize:20
             },
+            addForm:{
+                id,
+                displayName,
+                phone,
+                userName,
+                userPwd,
+                confirmPwd,
+                enabled
+            },
             userList:[],
             formType:'',
             formNameObj:{

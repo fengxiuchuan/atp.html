@@ -64,6 +64,18 @@
                 <el-form-item label="角色描述" prop="roleDesc">
                     <el-input  v-model="addForm.roleDesc" auto-complete="off" placeholder="请填写角色名称"></el-input>
                 </el-form-item>
+                <el-form-item label="授权" prop="menuIdArr">
+                    <el-tree
+                    :data="data2"
+                    show-checkbox
+                    default-expand-all
+                    node-key="id"
+                    ref="tree"
+                    v-model="addForm.menuIdArr"
+                    highlight-current
+                    :props="defaultProps">
+                    </el-tree>
+                </el-form-item>
             </el-form> 
             
 			<div slot="footer" class="dialog-footer">
@@ -78,12 +90,20 @@
 <script>
 
 import   {urlAddRole,urlEditRole,urlQueryAllList,urlDelRole} from '../api/req_role.js'
+import {urlQueryMenuTree} from '../api/req_menu.js'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
 export default {
     data:function(){
         
         return {
+            addForm:{
+                id,
+                roleCode,
+                roleName,
+                roleDesc,
+                menuIdArr,
+            },
             searchForm:{
                 roleCode:'',
                 roleName:'',
@@ -127,6 +147,7 @@ export default {
             formTitle:"新增",
             addFormVisible:false,
             addLoading:false,
+            data2:[]
         }
     },
     methods:{
@@ -163,6 +184,16 @@ export default {
             this.formTitle =this.formObj.edit.formTitle;
             this.addFormVisible = true;
             this.addForm = Object.assign({},row)
+        },
+        refreshRoleDetail:function(roleId){
+            let para = {id:roleId}
+             this.$http.post(urlQueryMenuTree, para, res => {
+            if(res && res.data && 'A_SYS_00010' === res.data.code && res.data.data.menuIdList > 0){
+               this.$refs.tree.setCheckedKeys(res.data.data.menuIdList);
+            }else{
+               this.$refs.tree.setCheckedKeys([]);
+            }
+        });
         },
         pageSearch:function(){
             this.page = pageination.page;
@@ -212,8 +243,18 @@ export default {
 			})
         },
     },
+    getMenuTree:function(){
+        this.$http.post(urlQueryMenuTree, {}, res => {
+            if(res && res.data && 'A_SYS_00010' === res.data.code && res.data.data.length > 0){
+                this.data2 = res.data.data;
+              }else{
+                this.data2 = [];
+            }
+        });
+    },
     mounted(){
         this.getRoleList();
+        this.getMenuTree();
     },
      components:{
         'pagination':Pageination
