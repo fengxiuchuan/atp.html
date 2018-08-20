@@ -132,13 +132,13 @@ export default {
                 pageSize:20
             },
             addForm:{
-                id,
-                displayName,
-                phone,
-                userName,
-                userPwd,
-                confirmPwd,
-                enabled
+                id:-1,
+                displayName:"",
+                phone:"",
+                userName:"",
+                userPwd:"",
+                confirmPwd:"",
+                enabled:-1
             },
             userList:[],
             formType:'',
@@ -168,6 +168,7 @@ export default {
                 ]
             },
             initAddForm:{
+                id:-1,
                 displayName:"",
                 phone:"",
                 userName:"",

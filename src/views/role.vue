@@ -98,17 +98,21 @@ export default {
         
         return {
             addForm:{
-                id,
-                roleCode,
-                roleName,
-                roleDesc,
-                menuIdArr,
+                id:-1,
+                roleCode:"",
+                roleName:"",
+                roleDesc:"",
+                menuIdArr:[]
             },
             searchForm:{
                 roleCode:'',
                 roleName:'',
                 page:1,
                 pageSize:20
+            },
+            defaultProps: {
+                children: 'children',
+                label: 'name'
             },
             roleList:[],
             formType:'',
@@ -126,9 +130,11 @@ export default {
                 
             },
             initAddForm:{
+                id:-1,
                 roleCode:"",
                 roleName:"",
-                roleDesc:""
+                roleDesc:"",
+                menuIdArr:[]    
             },
             formObj:{
                 add:{
@@ -202,6 +208,12 @@ export default {
             this.getRoleList();
         },
         formSubmit:function(){
+           
+           let checkedKeys = this.$refs.tree.getCheckedKeys();
+           let halfCheckedKeys =  this.$refs.tree.getHalfCheckedKeys();
+
+           let menuIdArr = checkedKeys.concat(halfCheckedKeys);
+            this.addForm.menuIdArr = Array.from(new Set(menuIdArr))
             var formSubmitUrl = '';
             var confirmTxt = '确认提交么?'
             if(this.formType === this.formObj.add.formType){
@@ -211,6 +223,7 @@ export default {
                 confirmTxt = "确认修改么？"
                 formSubmitUrl = urlEditRole;
             }
+          
             this.$refs[this.formNameObj.addForm].validate((valid) => {
 				if(valid){
 						this.$confirm(confirmTxt,'提示',{
@@ -242,16 +255,17 @@ export default {
 				}
 			})
         },
+        getMenuTree:function(){
+            this.$http.post(urlQueryMenuTree, {}, res => {
+                if(res && res.data && 'A_SYS_00010' === res.data.code && res.data.data.length > 0){
+                    this.data2 = res.data.data;
+                }else{
+                    this.data2 = [];
+                }
+            });
+        },
     },
-    getMenuTree:function(){
-        this.$http.post(urlQueryMenuTree, {}, res => {
-            if(res && res.data && 'A_SYS_00010' === res.data.code && res.data.data.length > 0){
-                this.data2 = res.data.data;
-              }else{
-                this.data2 = [];
-            }
-        });
-    },
+    
     mounted(){
         this.getRoleList();
         this.getMenuTree();

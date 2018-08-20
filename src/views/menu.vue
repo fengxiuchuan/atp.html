@@ -15,6 +15,7 @@
                 default-expand-all
                 :expand-on-click-node="false">
                 <span class="custom-tree-node" style="margin:5px;height:20px;" slot-scope="{ node, data }">
+                  
                 <span><el-input type="text" style="width:100px;heght:18px" size="small" :readonly="data.readOnly" v-model="data.name"  placeholder="请输入名称"></el-input></span>
                 <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.url" placeholder="url"></el-input></span>
                 <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.path" placeholder="path"></el-input></span>
@@ -26,9 +27,7 @@
                     <el-switch
                       v-model="data.state"
                       active-color="#13ce66"
-                      inactive-color="#ff4949"
-                      active-value="true"
-                      inactive-value="false">
+                      inactive-color="#ff4949">
                     </el-switch>
                     </span>
                   <span  >
@@ -108,13 +107,14 @@ export default {
               url:"",
               path:"",
               iconCls:"",
-              requireAuth:"",
+              keepAlive:true,
               requireAuth:true,
               state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: -1,
               inEdit:true,
               level:1,
               component:'',
+              sort:'',
               children:[]
         }
         ],
@@ -124,12 +124,13 @@ export default {
               url:"",
               path:"",
               iconCls:"",
-              requireAuth:"",
+              keepAlive:true,
               requireAuth:true,
               state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
               inEdit:true,
               component:'',
+               sort:'',
               children:[]
         },
         defaultProps: {
@@ -150,7 +151,7 @@ export default {
         console.log(data);
       },
       handlEdit(data){
-        data.inEdit = true;
+         this.$set(data, 'inEdit', true);
       },
       append(data,node,type) {
          let parentId = data.parentId;
@@ -163,18 +164,19 @@ export default {
          }
          let level = data.level;
          const newNode = {
-              id:"",
+              id:-1,
               name:"",
               url:"",
               path:"",
               iconCls:"",
-              requireAuth:"",
+              keepAlive:true,
               requireAuth:true,
               state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
               inEdit:true,
               level:-1,
               component:'',
+              sort:'',
               children:[]
         };
         serial = serial + 1
@@ -263,13 +265,15 @@ export default {
       },
       saveNode(data){
           if(data.id > 10000){
-            data.id = ''
+            data.id = -1
           }
           let submitUrl = urlAddMenu;
-          if(!data.inEdit){
+          if(data.id && data.id < 10000 && data.id != -1){
             submitUrl = urlEditMenu;
           }
-          let para = Object.assign({},data);
+          
+          let para = Object.assign({},data)
+        
           this.$http.post(submitUrl, para, res => {
             this.addLoading = false;
             if(res && res.data && 'A_SYS_00010' === res.data.code){
@@ -277,9 +281,8 @@ export default {
                   message: res.data.msg,
                   type: 'success'
                 });
-                
-                data.id = res.data.data.id;
-                data.inEdit = false;
+                this.$set(data,id,res.data.data.id);
+                 this.$set(data,inEdit,false);
               }else{
                 this.$message({
                   message: res.data.msg,
