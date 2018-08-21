@@ -6,5 +6,6 @@ const urlEditRole = '/sysRole/editRole.do'
 const urlQueryAllList = '/sysRole/queryAllList.json'
 // 删除角色
 const urlDelRole = '/sysRole/delRole.do'
-
-export {urlAddRole,urlEditRole,urlQueryAllList,urlDelRole}
+// 查询所有角色
+const urlGetRoleList = '/sysRole/getRoleList.json'
+export {urlAddRole,urlEditRole,urlQueryAllList,urlDelRole,urlGetRoleList}

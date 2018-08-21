@@ -61,6 +61,7 @@
             <el-table-column label="操作" width="200">
                 <template scope="scope">
                      <el-button size="small" icon="el-icon-edit-outline" @click="handleEdit(scope.$index, scope.row)"></el-button>
+                     <el-button size="small" icon="el-icon-edit-outline" @click="grantRole(scope.$index, scope.row)">授权</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -68,6 +69,22 @@
 
 		<!--工具条-->
 		<pagination @search="pageSearch" :total="total" :currentPage = "page"></pagination>
+
+
+        <el-dialog title="角色分配"  :visible.sync="userRoleFormVisible" :close-on-click-modal="true">
+            <el-form :model="userRoleForm" label-width="120px"  ref="userRoleForm" >
+                <el-input type="hidden" v-model="userRoleForm.id"></el-input>
+                 <el-form-item label="姓名" prop="displayName">
+                    <el-input  v-model="userRoleForm.displayName" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="角色列表" prop="userRoleArr">
+                    <el-transfer
+                        v-model="userRoleForm.userRoleArr"
+                        :data="roleList">
+                    </el-transfer>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
 
         <!--新增/编辑界面-->
 		<el-dialog :title="formTitle"  :visible.sync="addFormVisible" :close-on-click-modal="true">
@@ -109,6 +126,7 @@
 <script>
 
 import  {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser} from '../api/req_user.js'
+import {urlGetRoleList} from '../api/req_role.js'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
 export default {
@@ -124,6 +142,13 @@ export default {
         }
         };
         return {
+            userRoleForm:{
+                userRoleArr:[],
+                id:-1,
+                displayName:''
+            },
+            userRoleFormVisible:false,
+            roleList:[],
             searchForm:{
                 displayName:'',
                 userName:'',
@@ -233,7 +258,12 @@ export default {
             this.addFormVisible = true;
             this.addForm = Object.assign({},row)
             this.addFormRules.userPwd = '';
-            this.addFormRules.confirmPwd = ''
+            this.addFormRules.confirmPwd = '';
+           
+        },
+        grantRole:function(index,row){
+            this.userRoleFormVisible = true;
+            this.userRoleForm = Object.assign({},row)
         },
         pageSearch:function(){
             this.page = pageination.page;
@@ -282,9 +312,21 @@ export default {
 				}
 			})
         },
+        getRoleList:function(){
+            // 请求后台
+			this.$http.post(urlGetRoleList, para, res => {
+				if(res.data && 'A_SYS_00010' === res.data.code){
+					this.roleList = res.data.data;
+				}else{
+					this.roleList = []
+				}
+				
+			});
+        }
     },
     mounted(){
         this.getUserList();
+        this.getRoleList();
     },
      components:{
         'pagination':Pageination

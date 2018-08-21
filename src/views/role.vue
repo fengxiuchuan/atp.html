@@ -181,15 +181,27 @@ export default {
         },
         handleAdd:function(){
             this.formType = this.formObj.add.formType;
-            this.formTitle =this.formObj.add.formTitle;
+            this.formTitle =this.formObj.add.title;
             this.addFormVisible = true;
             this.addForm = this.initAddForm;
+            this.$nextTick(()=>{
+                 this.$refs.tree.setCheckedKeys([])
+            })
         },
         handleEdit:function(index,row){
             this.formType = this.formObj.edit.formType;
-            this.formTitle =this.formObj.edit.formTitle;
+            this.formTitle =this.formObj.edit.title;
             this.addFormVisible = true;
             this.addForm = Object.assign({},row)
+            this.$nextTick(()=>{
+                if(row.menuIdArr){
+                    for(let i = 0; i < row.menuIdArr.length; i++){
+                        this.$refs.tree.setChecked(row.menuIdArr[i],true,false)
+                    }
+                }
+            
+            })
+           
         },
         refreshRoleDetail:function(roleId){
             let para = {id:roleId}
