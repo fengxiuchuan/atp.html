@@ -314,7 +314,7 @@ export default {
         },
         getRoleList:function(){
             // 请求后台
-			this.$http.post(urlGetRoleList, para, res => {
+			this.$http.post(urlGetRoleList, {}, res => {
 				if(res.data && 'A_SYS_00010' === res.data.code){
 					this.roleList = res.data.data;
 				}else{
