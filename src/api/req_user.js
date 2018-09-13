@@ -8,5 +8,6 @@ const urlQueryAllList = '/sysUser/queryAllList.json'
 const urlDelUser = '/sysUser/delUser.do'
 // 更新用户
 const urlUpdateUser = '/sysUser/editUser.do'
-
-export {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser}
+// 分配角色
+const urlGrantRole = '/sysUser/grantRole.do'
+export {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser,urlGrantRole}

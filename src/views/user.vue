@@ -80,10 +80,15 @@
                 <el-form-item label="角色列表" prop="userRoleArr">
                     <el-transfer
                         v-model="userRoleForm.userRoleArr"
+                         :titles="['待选角色', '已选角色']"
                         :data="roleList">
                     </el-transfer>
                 </el-form-item>
             </el-form>
+            <div slot="footer" class="dialog-footer">
+				<el-button @click.native="userRoleFormVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="grantRoleSubmit" :loading="grantLoading">提交</el-button>
+			</div>
         </el-dialog>
 
         <!--新增/编辑界面-->
@@ -125,7 +130,7 @@
 </template>
 <script>
 
-import  {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser} from '../api/req_user.js'
+import  {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser,urlGrantRole} from '../api/req_user.js'
 import {urlGetRoleList} from '../api/req_role.js'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
@@ -169,7 +174,8 @@ export default {
             formType:'',
             formNameObj:{
                 searchForm:"searchForm",
-                addForm:"addForm"
+                addForm:"addForm",
+                userRoleForm:"userRoleForm"
             },
             userPwdRule:[
                 { required: true, message: '请输入密码', trigger: 'blur' }
@@ -218,6 +224,7 @@ export default {
             formTitle:"新增",
             addFormVisible:false,
             addLoading:false,
+            grantLoading:false,
 			viewOnly:false
         }
     },
@@ -263,7 +270,43 @@ export default {
         },
         grantRole:function(index,row){
             this.userRoleFormVisible = true;
+           
             this.userRoleForm = Object.assign({},row)
+            if(this.userRoleForm.userRoleArr == null){
+                this.userRoleForm.userRoleArr = []
+            }
+        },
+        grantRoleSubmit:function(){
+            let curUserRoleArr = this.userRoleForm.userRoleArr;
+            let userRoleList = []; 
+            this.userRoleForm.userRoleList = []
+            if(curUserRoleArr != null || curUserRoleArr.length > 0){
+                for(let i = 0;i < curUserRoleArr.length;i++){
+                    this.userRoleForm.userRoleList[i] = {"roleCode": curUserRoleArr[i],"userId":this.userRoleForm.id}
+                  
+                }
+            }
+
+           
+            let para = Object.assign({},this.userRoleForm)
+            this.$http.post(urlGrantRole, para, res => {
+                this.grantLoading = true;
+                if(res && res.data && 'A_SYS_00010' === res.data.code){
+                    this.$message({
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    this.$refs[this.formNameObj.userRoleForm].resetFields();
+                    this.grantLoading = false;
+                    this.getUserList();
+                }else{
+                    this.$message({
+                        message: res.data.msg,
+                        type: 'warning'
+                    });
+                }
+
+            });
         },
         pageSearch:function(){
             this.page = pageination.page;
