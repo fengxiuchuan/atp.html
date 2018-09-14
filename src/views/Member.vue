@@ -726,7 +726,7 @@ export default {
 				
 			}
 		}
-		alert(tempJson)
+		
 		let para = {json:tempJson}
 		this.$http.post('/atpMember/testJson.do', para, res => {
 			if(res && res.data && 'A_SYS_00010' === res.data.code){

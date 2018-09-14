@@ -1,84 +1,83 @@
 <template>
     <section>
        <!--树形控件-->
-            <el-input
-                    placeholder="输入关键字进行过滤"
-                    v-model="filterText">
-            </el-input>
-            <el-tree
-                style="margin-top: 10px;"
-                height="28px"
-                :data="data2"
+            <el-col :span="8">
+              <el-button type="primary" @click.native="addNode()">新增</el-button>	
+            <el-tree :data="data2"
                 :props="defaultProps"
-                node-key="id"
-                highlight-current
-                default-expand-all
-                :expand-on-click-node="false">
-                <span class="custom-tree-node" style="margin:5px;height:20px;" slot-scope="{ node, data }">
-                  
-                <span><el-input type="text" style="width:100px;heght:18px" size="small" :readonly="data.readOnly" v-model="data.name"  placeholder="请输入名称"></el-input></span>
-                <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.url" placeholder="url"></el-input></span>
-                <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.path" placeholder="path"></el-input></span>
-                <span><el-input type="text" style="width:120px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.component" placeholder="component"></el-input></span>
-                <span><el-input type="text" style="width:100px;heght:18px"  size="small" :readonly="data.readOnly" v-model="data.iconCls" placeholder="iconCls"></el-input></span>
-                <span style="width:30px" >
-                  
-                    <label>状态</label>
-                    <el-switch
-                      v-model="data.state"
-                      active-color="#13ce66"
-                      inactive-color="#ff4949">
-                    </el-switch>
-                    </span>
-                  <span  >
-                    <el-select style="width:100px"  size="small"  v-model="data.menuType"  placeholder="请选择" >
-                        <el-option
-                        v-for="item in menuTypeArr"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value" >
-                        </el-option>
-                    </el-select>
-                  </span>
-                  <span style="width:30px" >
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => remove(node, data)">
-                      删除
-                    </el-button>
-                    <el-button
-                      v-if="!data.inEdit"
-                      type="text"
-                      size="mini"
-                      @click="() => handlEdit(data)">
-                      编辑
-                    </el-button>
-                    <el-button
-                      v-if="data.inEdit"
-                      type="text"
-                      size="mini"
-                      @click="() => saveNode(data)">
-                      保存更新
-                    </el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => append(data,node,'')">
-                      新增同级
-                    </el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => append(data,node,'children')">
-                      新增下级
-                    </el-button>
-                  </span>
-                </span>
+                @node-click="handleNodeClick"
+                >
             </el-tree>
       
-        
-        
+            </el-col>
+            <el-col :span="12">
+              <el-form :model="menuForm" label-width="80px" :rules="menuRules" ref="menuForm" >
+                  <el-input type="hidden" v-model="menuForm.parentId"></el-input>
+                      <el-form-item label="上级菜单" >
+                        {{menuForm.parentName == null ? "菜单" : menuForm.parentName}}
+                      </el-form-item>
+                
+                      <el-form-item label="菜单名称" >
+                        <el-input  v-model="menuForm.name" auto-complete="off"></el-input>
+                      </el-form-item>
+                  
+                      <el-form-item label="URL" >
+                        <el-input  v-model="menuForm.url" auto-complete="off"></el-input>
+                      </el-form-item>
+                   
+                    
+                      <el-form-item label="组件名称" >
+                        <el-input  v-model="menuForm.component" auto-complete="off"></el-input>
+                      </el-form-item>
+                 
+                      <el-form-item label="菜单路径" >
+                        <el-input  v-model="menuForm.path" auto-complete="off"></el-input>
+                      </el-form-item>
+                   
+                  
+                   
+                      <el-form-item label="图标样式" >
+                        <el-input  v-model="menuForm.iconCls" auto-complete="off"></el-input>
+                      </el-form-item>
+                    
+                  
+                      <el-form-item label="状态" >
+                        
+                         <el-select v-model="menuForm.state" placeholder="请选择">
+                          <el-option
+                            v-for="item in stateArr"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                
+                    
+                      <el-form-item label="组件类型" >
+                         <el-select v-model="menuForm.menuType" placeholder="请选择">
+                          <el-option
+                            v-for="item in menuTypeArr"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+                      </el-form-item>
+                    
+                  
+                  <div slot="footer" class="dialog-footer">
+                    <el-button @click.native="duSubmit()">确定</el-button>
+                  </div>
+                  
+                  <el-form-item>
+                        <el-col :span="24">
+                            
+                            <el-button type="primary" @click.native="duSubmit()" :loading="addLoading">提交</el-button>	
+                        </el-col>
+              </el-form-item>
+                </el-form>
+            </el-col>
     </section>
 </template>
 <script>
@@ -95,21 +94,28 @@ export default {
       return {
         filterText: '',
         data2:[],
+        parentId:-1,
+        parentName:"菜单",
         menuTypeArr:[
           {label:"模块",value:"module"},
           {label:"菜单",value:"menu"},
           {label:"按钮",value:"btn"}
         ],
+        stateArr:[
+          {label:"有效",value:"Y"},
+          {label:"无效",value:"N"}
+        ],
         initRoot:[
           {
               id:0,
               name:"",
+              parentName:"",
               url:"",
               path:"",
               iconCls:"",
               keepAlive:true,
               requireAuth:true,
-              state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              state:"Y",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: -1,
               inEdit:true,
               level:1,
@@ -118,15 +124,33 @@ export default {
               children:[]
         }
         ],
-        nodeObj:{
+        menuRules:{},
+        menuForm:{
               id:"",
               name:"",
+              parentName:"",
               url:"",
               path:"",
               iconCls:"",
               keepAlive:true,
               requireAuth:true,
-              state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              state:"Y",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              parentId: '',
+              inEdit:true,
+              component:'',
+               sort:'',
+              children:[]
+        },
+        nodeObj:{
+              id:"",
+              name:"",
+              parentName:"",
+              url:"",
+              path:"",
+              iconCls:"",
+              keepAlive:true,
+              requireAuth:true,
+              state:"Y",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
               inEdit:true,
               component:'',
@@ -147,8 +171,16 @@ export default {
       };
     },
     methods: {
+      addNode:function(){
+        let node = this.nodeObj;
+        node.parentId = this.parentId;
+        node.parentName = this.parentName;
+        this.menuForm = node;
+      },
       handleNodeClick(data) {
-        console.log(data);
+        this.parentId = data.id;
+        this.parentName = data.parentName;
+        this.menuForm = Object.assign({},data)
       },
       handlEdit(data){
          this.$set(data, 'inEdit', true);
@@ -166,12 +198,13 @@ export default {
          const newNode = {
               id:-1,
               name:"",
+              parentName:"",
               url:"",
               path:"",
               iconCls:"",
               keepAlive:true,
               requireAuth:true,
-              state:true,  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
+              state:"Y",  //根据后台给的是否可删除节点，也可以根据当前的node节点自行判断
               parentId: '',
               inEdit:true,
               level:-1,
@@ -262,6 +295,31 @@ export default {
                 this.data2 = this.initRoot;
             }
         });
+      },
+      duSubmit(){
+          let formSubmitURl = urlAddMenu;
+          if(this.menuForm.id != '' && this.menuForm.id != null && this.menuForm.id != -1){
+             formSubmitURl = urlEditMenu;
+          }
+          let para = Object.assign({},this.menuForm)
+        
+          this.$http.post(formSubmitURl, para, res => {
+            this.addLoading = false;
+            if(res && res.data && 'A_SYS_00010' === res.data.code){
+                this.$message({
+                  message: res.data.msg,
+                  type: 'success'
+                });
+                this.menuForm = this.nodeObj;
+                this.getMenuTree()
+              }else{
+                this.$message({
+                  message: res.data.msg,
+                  type: 'warning'
+                });
+            }
+
+          });
       },
       saveNode(data){
           if(data.id > 10000){

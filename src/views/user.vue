@@ -280,16 +280,14 @@ export default {
             let curUserRoleArr = this.userRoleForm.userRoleArr;
             let userRoleList = []; 
             this.userRoleForm.userRoleList = []
+            
             if(curUserRoleArr != null || curUserRoleArr.length > 0){
-                for(let i = 0;i < curUserRoleArr.length;i++){
-                    this.userRoleForm.userRoleList[i] = {"roleCode": curUserRoleArr[i],"userId":this.userRoleForm.id}
-                  
-                }
+                this.userRoleForm.roleCodes = curUserRoleArr.join(",")
             }
 
            
-            let para = Object.assign({},this.userRoleForm)
-            this.$http.post(urlGrantRole, para, res => {
+            //let para = Object.assign({},this.userRoleForm)
+            this.$http.post(urlGrantRole, this.userRoleForm, res => {
                 this.grantLoading = true;
                 if(res && res.data && 'A_SYS_00010' === res.data.code){
                     this.$message({
@@ -299,6 +297,7 @@ export default {
                     this.$refs[this.formNameObj.userRoleForm].resetFields();
                     this.grantLoading = false;
                     this.getUserList();
+                     this.userRoleFormVisible = false;
                 }else{
                     this.$message({
                         message: res.data.msg,
