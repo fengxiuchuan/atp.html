@@ -27,8 +27,7 @@
 
         <!--列表-->
         <el-table :data="courseList" highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
-            <el-table-column type="selection" width="55">
-            </el-table-column>
+        
             <el-table-column type="index" >
             </el-table-column>
             <el-table-column prop="courseName" label="课程名称" sortable>

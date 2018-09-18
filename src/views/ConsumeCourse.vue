@@ -33,7 +33,7 @@
         <el-col v-show="listDisplay" :span="24" class="toolbar" style="padding-bottom: 0px;">
             <el-form :inline="true">
                 <el-form-item>
-                    <el-button type="primary" @click="toConsume">充值</el-button>
+                    <el-button type="primary" @click="toConsume">销课</el-button>
                 </el-form-item>
             </el-form>
         </el-col>
@@ -42,7 +42,7 @@
         <el-table v-show="listDisplay" :data="memConsumeList" border stripe highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
             <el-table-column prop="consumeNo" label="消费订单编号">
             </el-table-column>
-            <el-table-column prop="memCardNo" label="会员卡号" >
+            <el-table-column prop="cardNo" label="会员卡号" >
             </el-table-column>
             <el-table-column prop="memName" label="姓名">
             </el-table-column>
@@ -105,7 +105,7 @@
 				</el-row>
                 <el-row>
                     <el-col :span="4" style="float:right">
-                        <el-button plain>取消</el-button>
+                        <el-button type="primary" @click.native="cancelSubmit">取消</el-button>
                         <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
                     </el-col>
                 </el-row>
@@ -301,7 +301,7 @@ export default {
             this.$refs['addForm'].resetFields();
             this.listDisplay = true;
             this.addFormDisplay = false;
-            this.queryAllChargeList();
+            this.queryAllConsumeList();
         },
         toConsume:function(){
             this.listDisplay = false;
@@ -343,6 +343,7 @@ export default {
     },
     mounted(){
         this.initMemberList();
+        this.queryAllConsumeList();
        
     },
     components:{

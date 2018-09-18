@@ -26,8 +26,7 @@
 
         <!--列表-->
         <el-table :data="coachList" highlight-current-row v-loading="listLoading" style="width: 100%;"  size="small">
-            <el-table-column type="selection" width="55">
-            </el-table-column>
+            
             <el-table-column type="index" >
             </el-table-column>
             <el-table-column prop="coachName" label="姓名"  sortable>
@@ -43,8 +42,7 @@
             </el-table-column>
             <el-table-column prop="birth" label="出生日期"  sortable>
              </el-table-column>
-            <el-table-column prop="userAccount" label="用户名"  sortable>
-            </el-table-column>
+           
             <el-table-column prop="jobState" label="是否在职"  >
                  <template scope="scope">
                         <el-switch disabled
@@ -121,18 +119,7 @@
 					</el-col>
 					
 				</el-row>
-				<el-row>
-                    <el-col :span="12">
-                        <el-form-item label="用户名" prop="userAccount">
-                            <el-input  v-model="addForm.userAccount" placeholder="请填写用户名"/>
-                        </el-form-item>
-                    </el-col>
-					<el-col :span="12">
-						<el-form-item label="用户密码" prop="userPasswd"> 
-							<el-input    v-model="addForm.userPasswd" placeholder="用户密码"></el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
+				
                 <el-row>
                     <el-col :span="12">
                         <el-form-item label="教练编号" prop="coachNo">
@@ -217,14 +204,7 @@
 						</el-form-item>
 					</el-col>
 				</el-row>
-				<el-row>
-					<el-col :span="12">
-						<el-form-item label="用户名" > 
-							<span v-text="coach.userAccount"></span>
-						</el-form-item>
-					</el-col>
-                </el-row>
-                
+				
                 <el-row>
                     <el-col :span="12">
                         <el-form-item label="教练编号">
@@ -331,12 +311,7 @@ export default {
                 gymId:[
                     { required: true, message: '请选择场馆', trigger: 'blur' }, 
                 ],
-                userAccount:[
-                    { required: true, message: '请输入用户名', trigger: 'blur' }, 
-                ],
-                userPasswd:[
-                    { required: true, message: '请输入用户密码', trigger: 'blur' }, 
-                ],
+               
                 courseIdArr:[
                      { required: true, message: '请输入选择教授课程', trigger: 'blur' }, 
                 ]
@@ -447,8 +422,8 @@ export default {
 								    this.$message({
 										message: res.data.msg,
 										type: 'success'
-									});
-									this.$refs[this.formTypeObj.addForm].resetFields();
+                                    });
+									this.$refs[this.formNameObj.addForm].resetFields();
 									this.addFormVisible = false;
 									this.getCoachList();
 								}else{

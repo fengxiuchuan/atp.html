@@ -106,10 +106,10 @@
                     <el-input  v-model="addForm.userName" auto-complete="off" placeholder="请填写用户名"></el-input>
                 </el-form-item>
                 <el-form-item v-if="formType == formObj.add.formType" label="密码" prop="userPwd">
-                    <el-input   type="text"  v-model="addForm.userPwd" auto-complete="off"  placeholder="请填写用户密码"></el-input>
+                    <el-input  type="password"  v-model="addForm.userPwd" auto-complete="off"  placeholder="请填写用户密码"></el-input>
                 </el-form-item>
                 <el-form-item v-if="formType == formObj.add.formType" label="重复密码" >
-                    <el-input  v-model="addForm.confirmPwd" :min="0" :max="11"  placeholder="重复密码"></el-input>
+                    <el-input type="password"  v-model="addForm.confirmPwd" :min="0" :max="11"  placeholder="重复密码"></el-input>
                 </el-form-item>
                 <el-form-item label="状态" prop="enabled">
                      <el-radio-group    v-model="addForm.enabled">

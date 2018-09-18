@@ -96,6 +96,7 @@ export default {
         data2:[],
         parentId:-1,
         parentName:"菜单",
+        addLoading:false,
         menuTypeArr:[
           {label:"模块",value:"module"},
           {label:"菜单",value:"menu"},
@@ -179,7 +180,7 @@ export default {
       },
       handleNodeClick(data) {
         this.parentId = data.id;
-        this.parentName = data.parentName;
+        this.parentName = data.name;
         this.menuForm = Object.assign({},data)
       },
       handlEdit(data){

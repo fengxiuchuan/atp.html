@@ -118,12 +118,22 @@ export default {
     //折叠导航栏
     collapse: function() {
       this.collapsed = !this.collapsed;
+      if(this.collapsed){
+        this.$refs.menuCollapsed.getElementsByClassName(
+        "el-menu-vertical-demo"
+      )[0].style = ''
+        
+      }
     },
     showMenu(i, status) {
       this.$refs.menuCollapsed.getElementsByClassName(
         "submenu-hook-" + i
       )[0].style.display = status ? "block" : "none";
+
+     
     }
+
+   
   },
   mounted() {
     var user = sessionStorage.getItem("user");
