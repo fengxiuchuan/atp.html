@@ -23,6 +23,8 @@ const urlConsumeCourse = '/atpMember/consumeCourse.do'
 const urlAllMemCourseList = '/atpMember/queryMemCourseList.json'
 // 课耗列表
 const urlAllMemConsumeList = '/atpMember/queryConsumeList.json'
+// 校验课程
+const urlAuthPwd = '/atpMember/authPwd.do'
 
 export { urlMemberList, urlAddMember, urlUpdateMember, urlGetMemById, urlGetCourseListByMemId, urlGetMemberList, urlPayCourse, urlConsumeCourse,
-    urlAllMemConsumeList, urlAllMemCourseList }
+    urlAllMemConsumeList, urlAllMemCourseList,urlAuthPwd }

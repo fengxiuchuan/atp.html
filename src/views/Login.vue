@@ -16,7 +16,8 @@
 </template>
 
 <script>
-  import { requestLogin } from '../api/api';
+  import { urlLogin } from '../api/req_user.js';
+  import {mapActions} from 'vuex'
   //import NProgress from 'nprogress'
   export default {
     data() {
@@ -40,6 +41,7 @@
       };
     },
     methods: {
+      ...mapActions({add_Routes: 'add_Routes'}),
       handleReset2() {
         this.$refs.ruleForm2.resetFields();
       },
@@ -50,21 +52,29 @@
             //_this.$router.replace('/table');
             this.logining = true;
             //NProgress.start();
-            var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-            requestLogin(loginParams).then(data => {
-              this.logining = false;
-              //NProgress.done();
-              let { msg, code, user } = data;
-              if (code !== 200) {
-                this.$message({
-                  message: msg,
-                  type: 'error'
-                });
-              } else {
-                sessionStorage.setItem('user', JSON.stringify(user));
-                this.$router.push({ path: '/table' });
-              }
-            });
+            var loginParams = { userName: this.ruleForm2.account, userPwd: this.ruleForm2.checkPass };
+            this.$http.post(urlLogin, loginParams, res => {
+							this.logining = false;
+							if(res && res.data && res.data.code === 'A_SYS_00010'){
+							  
+								this.$message({
+									message: res.data.msg,
+									type: 'success'
+								});
+                this.handleReset2();
+                sessionStorage.setItem("user",JSON.stringify(res.data.data));
+                sessionStorage.setItem("routes",JSON.stringify(res.data.data.menuList));
+							   // 跳转至首页
+                 this.$router.push({ path: '/Member' })
+                 this.$store.add_Routes(res.data.data.menuList)
+							}else{
+								this.$message({
+									message: res.data.msg,
+									type: 'warning'
+								});
+							}
+
+						});
           } else {
             console.log('error submit!!');
             return false;

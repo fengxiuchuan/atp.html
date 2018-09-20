@@ -101,21 +101,34 @@
 							</template>
 						</el-form-item>
 					</el-col>
-					
 				</el-row>
                 <el-row>
                     <el-col :span="4" style="float:right">
                         <el-button type="primary" @click.native="cancelSubmit">取消</el-button>
-                        <el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+                        <el-button type="primary" @click.native="showPwdForm" :loading="addLoading">提交</el-button>
                     </el-col>
                 </el-row>
 			</el-form>
 			
+
+        <!--输入密码框-->
+        <el-dialog title="请输入密码"  :visible.sync="pwdVisible" :close-on-click-modal="true">
+			<el-form :model="pwdForm" label-width="80px" :rules="pwdFormRules" ref="pwdForm" >
+                <el-input type="hidden" name="id"></el-input>
+				<el-form-item label="请输入密码" prop="cardPwd">
+                    <el-input type="text" v-model="pwdForm.cardPwd"></el-input>
+                </el-form-item>
+             </el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="pwdVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="addSubmit" :loading="pwdLoading">确定</el-button>
+			</div>
+		</el-dialog>
     </section>
 </template>
 <script>
 import 
-{ urlGetMemberList,urlConsumeCourse,urlGetCourseListByMemId,urlAllMemConsumeList} from "../api/req_member";
+{ urlGetMemberList,urlConsumeCourse,urlGetCourseListByMemId,urlAllMemConsumeList,urlAuthPwd} from "../api/req_member";
 import {urlGetGymCourseList} from '../api/req_course'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
@@ -135,9 +148,14 @@ export default {
                     { required: true, message: '请选择需要销课的会员', trigger: 'blur' },
                 ]
             },
-            addForm:{
-               
+            pwdFormRules:{
+                cardPwd:[
+                     { required: true, message: '请输入密码', trigger: 'blur' },
+                ]
             },
+            pwdForm:{id:-1,cardPwd:''},
+            pwdVisible:false,
+            pwdLoading:false,
             addForm:{},
             addFormDisplay:false,
             listDisplay:true,
@@ -188,6 +206,11 @@ export default {
                 this.selectedCourseList = []
             }
             
+        },
+        showPwdForm:function(){
+            this.pwdForm.id = this.addForm.memId;
+            this.pwdForm.cardPwd = ''
+            this.pwdVisible=true;
         },
         refreshSelectedCourses:function(selectedCourseList){
             if(!selectedCourseList){
@@ -308,35 +331,56 @@ export default {
             this.addFormDisplay = true;
         },
         addSubmit:function(){
-            this.$refs['addForm'].validate((valid) => {
+            //校验
+
+
+            this.$refs['pwdForm'].validate((valid) => {
                 if(valid){
-                    this.$confirm("确认提交么？",'提示',{
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'info '
-                    }).then(() => {
-                        this.addLoading = true;
-                        let para = Object.assign({}, this.addForm);
-                        this.$http.post(urlConsumeCourse, para, res => {
-                            this.addLoading = false;
+                      
+                      this.$http.post(urlAuthPwd, this.pwdForm, res => {
+                            this.pwdLoading = true;
                             if(res && res.data && res.data.code === 'A_SYS_00010'){
-                               this.$message({
-                                    message: res.data.msg,
-                                    type: 'success'
-                                });
-                                this.$refs['addForm'].resetFields();
-                                // 跳转至销课成功
-                                this.$router.push({ path: '/chargeSuc' })
+                                if(res.data.data){
+                                    this.addLoading = true;
+                                    let para = Object.assign({}, this.addForm);
+                                    this.$http.post(urlConsumeCourse, para, res => {
+                                        this.addLoading = false;
+                                        if(res && res.data && res.data.code === 'A_SYS_00010'){
+                                             this.$message({
+                                                message: res.data.msg,
+                                                type: 'success'
+                                            });
+                                            this.$refs['addForm'].resetFields();
+                                            this.$refs['pwdForm'].resetFields();
+                                            // 跳转至销课成功
+                                            this.$router.push({ path: '/chargeSuc' })
+                                            
+                                        }else{
+                                            this.$message({
+                                                message: res.data.msg,
+                                                type: 'warning'
+                                            });
+                                        }
+
+                                    });
+                                }else{
+                                    this.$message({
+                                        message: res.data.msg,
+                                        type: 'warning'
+                                    });
+                                    this.pwdLoading = flase;
+                                }
                                 
                             }else{
                                 this.$message({
                                     message: res.data.msg,
                                     type: 'warning'
                                 });
+                                 this.pwdLoading = flase;
                             }
 
                         });
-                    })
+
                 }
             })
         }

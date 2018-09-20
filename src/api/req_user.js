@@ -10,4 +10,6 @@ const urlDelUser = '/sysUser/delUser.do'
 const urlUpdateUser = '/sysUser/editUser.do'
 // 分配角色
 const urlGrantRole = '/sysUser/grantRole.do'
-export {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser,urlGrantRole}
+// 用户登录
+const urlLogin = '/sysUser/login.do'
+export {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser,urlGrantRole,urlLogin}
