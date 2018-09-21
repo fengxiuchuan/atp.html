@@ -2,7 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
-import routes from './router/routes.js'
+import router from './router'
 import Api from './api/api.js'
 import ElementUI from 'element-ui'
 import VueRouter from 'vue-router'
@@ -19,26 +19,25 @@ Vue.use(VueNumeric)
 
 Vue.config.productionTip = false
 
-const router = new VueRouter({
-  routes
-})
 // 如果不使用原型，将会报错
 
 Vue.prototype.$http = Api
 
-// 用户手动刷新页面，这是路由会被重设，要重新新增
-if (sessionStorage.getItem('user')) {
-  let routes = JSON.parse(sessionStorage.getItem('routes'))
-  store.dispatch('add_Routes', routes)
-}
 // 登录状态判断
 router.beforeEach((to, from, next) => {
   if (!sessionStorage.getItem('user') && to.path !== '/login') {
     next({
-      path: '/login',
-      query: {redirect: to.fullPath}
+      path: '/login'
     })
   } else {
+    let curMenustate = store.getters.getMenuState;
+    // 用户手动刷新页面，这是路由会被重设，要重新新增
+    if (sessionStorage.getItem('user') && !store.getters.getMenuState) {
+      let routes = JSON.parse(sessionStorage.getItem('routes'))
+      store.dispatch('add_Routes', routes)
+      store.dispatch('set_menu', true)
+      console.log(router)
+    }
     next()
   }
 })/* eslint-disable no-new */

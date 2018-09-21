@@ -24,8 +24,8 @@
       return {
         logining: false,
         ruleForm2: {
-          account: 'admin',
-          checkPass: '123456'
+          account: '',
+          checkPass: ''
         },
         rules2: {
           account: [
@@ -64,9 +64,11 @@
                 this.handleReset2();
                 sessionStorage.setItem("user",JSON.stringify(res.data.data));
                 sessionStorage.setItem("routes",JSON.stringify(res.data.data.menuList));
+                localStorage.setItem("token",res.data.data.token)
+                
 							   // 跳转至首页
-                 this.$router.push({ path: '/Member' })
-                 this.$store.add_Routes(res.data.data.menuList)
+                 this.$router.push({ path: '/Home' })
+                 //this.$store.add_Routes(res.data.data.menuList)
 							}else{
 								this.$message({
 									message: res.data.msg,

@@ -112,6 +112,8 @@ export default {
         .then(() => {
           sessionStorage.removeItem("user");
           sessionStorage.removeItem("routes");
+          localStorage.removeItem("token")
+          store.dispatch('REMOVE_MENU', false)
           _this.$router.push("/login");
         })
         .catch(() => {});

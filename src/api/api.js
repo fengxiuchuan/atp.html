@@ -40,7 +40,7 @@ let http = axios.create({
 
 function apiAxios (method, url, params, response) {
   if (params) {
-    params.token = ''
+    params.token = localStorage.getItem('token')
   }
   http({
     method: method,
