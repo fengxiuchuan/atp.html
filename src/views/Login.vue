@@ -83,7 +83,10 @@
           }
         });
       }
-    }
+    },
+    mounted() {
+       this.$store.dispatch("remove_menu")
+    },
   }
 
 </script>

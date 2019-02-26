@@ -22,23 +22,27 @@ Vue.config.productionTip = false
 // 如果不使用原型，将会报错
 
 Vue.prototype.$http = Api
-
 // 登录状态判断
 router.beforeEach((to, from, next) => {
-  if (!sessionStorage.getItem('user') && to.path !== '/login') {
-    next({
-      path: '/login'
-    })
-  } else {
-    let curMenustate = store.getters.getMenuState;
-    // 用户手动刷新页面，这是路由会被重设，要重新新增
-    if (sessionStorage.getItem('user') && !store.getters.getMenuState) {
-      let routes = JSON.parse(sessionStorage.getItem('routes'))
-      store.dispatch('add_Routes', routes)
-      store.dispatch('set_menu', true)
-      console.log(router)
-    }
+  if (to.path == '/login') {
     next()
+  } else {
+    if (!sessionStorage.getItem('user') && to.path !== '/login') {
+      next({
+        path: '/login'
+      })
+    } else {
+      let curMenustate = store.getters.getMenuState
+      // 用户手动刷新页面，这是路由会被重设，要重新新增
+      if (sessionStorage.getItem('user') && !store.getters.getMenuState) {
+        let routes = JSON.parse(sessionStorage.getItem('routes'))
+        store.dispatch('add_Routes', routes)
+        store.dispatch('set_menu', true)
+        router.push('/')
+        console.log(router)
+      }
+      next()
+    }
   }
 })/* eslint-disable no-new */
 new Vue({
