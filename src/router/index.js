@@ -3,8 +3,17 @@ import NotFound from '../views/404.vue'
 import Home from '../views/Home.vue'
 import Vue from 'vue'
 import Router from 'vue-router'
-import SysMenu from '../views/menu.vue'
+import SysMenu from '../views/Menu.vue'
 
+import Coach from '../views/Coach'
+import ConsumeCourse from '../views/ConsumeCourse'
+import Course from '../views/Course'
+import Gym from '../views/Gym'
+import Member from '../views/Member'
+import MemCharge from '../views/MemCharge'
+
+import Role	 from '../views/Role'
+import User from '../views/User'
 import ChargeSuc from '../views/ChargeSuc.vue'
 
 Vue.use(Router)
@@ -28,6 +37,23 @@ let routes = [
     component: ChargeSuc,
     hidden: true
   },
+  {
+    path: '/',
+    component: Home,
+    name: '首页',
+    iconCls: 'el-icon-message',
+    children: [
+      { path: '/coach', component: Coach, name: '教练', hidden: true },
+      { path: '/consumeCourse', component: ConsumeCourse, name: '销课列表' },
+      { path: '/course', component: Course, name: '课程管理' },
+      { path: '/gym', component: Gym, name: '场馆管理' },
+      { path: '/member', component: Member, name: '会员管理' },
+      { path: '/memCharge', component: MemCharge, name: '充值列表' },
+      { path: '/menu', component: SysMenu, name: '菜单管理' },
+      { path: '/role', component: Role, name: '角色管理' },
+      { path: '/user', component: User, name: '用户管理' }
+    ]
+  }
   // { path: '/main', component: Main },
   // {
   //   path: '/',

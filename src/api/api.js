@@ -1,10 +1,13 @@
 import axios from 'axios'
+
+import qs from 'querystring'
 // 解决axios跨域问题
 axios.defaults.withCredentials = true
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 axios.defaults.timeout = 6000
 
 let baseURL = 'http://localhost:7005'
+// let baseURL = 'http://111.230.61.164:7005'
 export const getMemberList = params => { return axios.post(`/atpMember/queryAllList.json`, { params: params }) }
 
 export const requestLogin = params => { return axios.post(`/login`, params).then(res => res.data) }
@@ -25,16 +28,11 @@ let http = axios.create({
   baseURL: baseURL,
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+    'Content-Type': 'application/json;charset=utf-8'
   },
   transformRequest: [function (data) {
-    let newData = ''
-    for (let k in data) {
-      if (data.hasOwnProperty(k) === true) {
-        newData += encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) + '&'
-      }
-    }
-    return newData
+    data = qs.stringify(data)
+    return data
   }]
 })
 

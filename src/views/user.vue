@@ -272,6 +272,7 @@ export default {
             this.userRoleFormVisible = true;
            
             this.userRoleForm = Object.assign({},row)
+            this.userRoleForm.menuList = null
             if(this.userRoleForm.userRoleArr == null){
                 this.userRoleForm.userRoleArr = []
             }
@@ -287,7 +288,9 @@ export default {
 
            
             //let para = Object.assign({},this.userRoleForm)
-            this.$http.post(urlGrantRole, this.userRoleForm, res => {
+            this.$http.post(urlGrantRole, this.userRoleForm,
+             {headers: {'Content-Type': 'application/json'}},
+            res => {
                 this.grantLoading = true;
                 if(res && res.data && 'A_SYS_00010' === res.data.code){
                     this.$message({
