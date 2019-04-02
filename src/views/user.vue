@@ -134,6 +134,7 @@ import  {urlAddUser,urlEditUser,urlQueryAllList,urlDelUser,urlUpdateUser,urlGran
 import {urlGetRoleList} from '../api/req_role.js'
 import util from '../common/js/util'
 import Pageination from '../components/pagination'
+import axios from 'axios'
 export default {
     data:function(){
         var validatePass = (rule, value, callback) => {
@@ -286,29 +287,35 @@ export default {
                 this.userRoleForm.roleCodes = curUserRoleArr.join(",")
             }
 
-           
-            //let para = Object.assign({},this.userRoleForm)
-            this.$http.post(urlGrantRole, this.userRoleForm,
-             {headers: {'Content-Type': 'application/json'}},
-            res => {
-                this.grantLoading = true;
-                if(res && res.data && 'A_SYS_00010' === res.data.code){
+           axios.post("http://localhost:7005/sysUser/grantRole.do",this.userRoleForm,{
+                   headers: {
+                    'Content-Type':'application/json;charset=UTF-8'
+                        }
+               }).then((res) =>{
+                     this.grantLoading = true;
+                    if(res && res.data && 'A_SYS_00010' === res.data.code){
+                        this.$message({
+                            message: res.data.msg,
+                            type: 'success'
+                        });
+                        this.$refs[this.formNameObj.userRoleForm].resetFields();
+                        this.grantLoading = false;
+                        this.getUserList();
+                        this.userRoleFormVisible = false;
+                    }else{
+                        this.$message({
+                            message: res.data.msg,
+                            type: 'warning'
+                        });
+                    }
+               }).catch((res) =>{
+                  
                     this.$message({
-                        message: res.data.msg,
-                        type: 'success'
-                    });
-                    this.$refs[this.formNameObj.userRoleForm].resetFields();
-                    this.grantLoading = false;
-                    this.getUserList();
-                     this.userRoleFormVisible = false;
-                }else{
-                    this.$message({
-                        message: res.data.msg,
+                        message: "提交失败",
                         type: 'warning'
                     });
-                }
-
-            });
+               });
+           
         },
         pageSearch:function(){
             this.page = pageination.page;
