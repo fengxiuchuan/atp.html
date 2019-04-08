@@ -256,7 +256,7 @@ import {responeSucCode} from '../api/response'
 import util from '../common/js/util'
 import formUtil from '../common/js/formUitl'
 import Pageination from '../components/pagination'
-
+import axios from 'axios'
 export default {
     data:function(){
         return {
@@ -416,24 +416,35 @@ export default {
 							this.addLoading = true;
 							let para = Object.assign({}, this.addForm);
 							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							this.$http.post(formSubmitUrl, para, res => {
-								this.addLoading = false;
-								if(res && res.data && 'A_SYS_00010' === res.data.code){
-								    this.$message({
-										message: res.data.msg,
-										type: 'success'
-                                    });
-									this.$refs[this.formNameObj.addForm].resetFields();
-									this.addFormVisible = false;
-									this.getCoachList();
-								}else{
-									this.$message({
-										message: res.data.msg,
-										type: 'warning'
-									});
-								}
-
-							});
+                            
+                            axios.post("http://localhost:7005/"+formSubmitUrl,para,{
+                                    headers: {
+                                        'Content-Type':'application/json;charset=UTF-8'
+                                            }
+                                }).then((res) =>{
+                                        this.grantLoading = true;
+                                        if(res && res.data && 'A_SYS_00010' === res.data.code){
+                                            this.$message({
+                                                message: res.data.msg,
+                                                type: 'success'
+                                            });
+                                            this.$refs[this.formNameObj.addForm].resetFields();
+                                            this.addFormVisible = false;
+                                            this.getCoachList();
+                                        }else{
+                                            this.$message({
+                                                message: res.data.msg,
+                                                type: 'warning'
+                                            });
+                                        }
+                                }).catch((res) =>{
+                                    
+                                        this.$message({
+                                            message: "提交失败",
+                                            type: 'warning'
+                                        });
+                                });
+                           
 						})
 				}
 			})

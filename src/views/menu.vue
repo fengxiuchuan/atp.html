@@ -342,6 +342,8 @@ export default {
                 });
                 this.$set(data,id,res.data.data.id);
                  this.$set(data,inEdit,false);
+                  // 跳转至用户列表
+                  this.$router.push({ path: '/menu' })
               }else{
                 this.$message({
                   message: res.data.msg,

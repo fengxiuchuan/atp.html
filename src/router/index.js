@@ -43,7 +43,7 @@ let routes = [
     name: '首页',
     iconCls: 'el-icon-message',
     children: [
-      { path: '/coach', component: Coach, name: '教练', hidden: true },
+      { path: '/coach', component: Coach, name: '教练' },
       { path: '/consumeCourse', component: ConsumeCourse, name: '销课列表' },
       { path: '/course', component: Course, name: '课程管理' },
       { path: '/gym', component: Gym, name: '场馆管理' },

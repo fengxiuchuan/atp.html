@@ -70,6 +70,7 @@
 </template>
 <script>
 import util from '../common/js/util'
+import { urlGetCoachListByCourseId } from '../api/req_coach';
 export default {
     data:function(){
         return {
@@ -100,6 +101,18 @@ export default {
                     
                 }
             });
+            if(coachList == null || coachList.lenght == 0){
+                this.$http.post(urlGetCoachListByCourseId, {courseId:curCourseId}, res => {
+                    if(res && res.data && 'A_SYS_00010' === res.data.code){
+                        coachList = res.data.data;
+                    }else{
+                        coachList = [];
+                    }
+                })
+            }
+        
+            
+
             return coachList;
         },
         coachChange:function(index,row){

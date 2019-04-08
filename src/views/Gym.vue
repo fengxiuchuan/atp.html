@@ -394,7 +394,7 @@ export default {
 				this.viewOnly = false
 			}
 
-			if(this.formObj.viewformType === formType ){
+			if(this.formObj.view.formType === formType ){
 				this.formTitle = this.formObj.view.title;
                 this.formType = this.formObj.view.formType
                 this.viewOnly = true
